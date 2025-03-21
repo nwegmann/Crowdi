@@ -8,8 +8,18 @@
 </head>
 
 <body>
-    <h1>Ask a Question</h1>
 
+    {% if not user_id %}
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        <input type="text" name="username" required placeholder="Enter your name">
+        <button type="submit">Log in</button>
+    </form>
+    {% else %}
+    <p>You are logged in as user #{{ user_id }}</p>
+    {% endif %}
+
+    <h1>Ask a Question</h1>
     <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
         <input type="text" name="text" required placeholder="Your question">
 

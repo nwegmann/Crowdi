@@ -1,16 +1,18 @@
 <div id="questions">
     <h2>Recent Questions</h2>
     <ul>
-        {% for id, text, type in questions %}
+        {% for id, text, type, has_responded in questions %}
         <li>
             <strong>[{{ type }}]</strong> {{ text }}
-
-            {% if type == "yesno" %}
+        
+            {% if type == "yesno" and not has_responded %}
             <form hx-post="/respond" hx-target="this" hx-swap="outerHTML">
                 <input type="hidden" name="question_id" value="{{ id }}">
                 <button name="response" value="yes">👍 Yes</button>
                 <button name="response" value="no">👎 No</button>
             </form>
+            {% elif has_responded %}
+            <p><em>You already responded.</em></p>
             {% endif %}
         </li>
         {% endfor %}

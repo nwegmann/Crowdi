@@ -19,10 +19,25 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 # Initialize SQLite DB
 DB_PATH = os.path.join(BASE_DIR, "crowdi.db")
 
-def get_questions():
+# def get_questions():
+#     with sqlite3.connect(DB_PATH) as conn:
+#         c = conn.cursor()
+#         c.execute("SELECT id, text, type FROM questions ORDER BY id DESC")
+#         questions = c.fetchall()
+#     return questions
+
+def get_questions(user_id):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("SELECT id, text, type FROM questions ORDER BY id DESC")
+        c.execute("""
+            SELECT q.id, q.text, q.type,
+            EXISTS (
+                SELECT 1 FROM responses r
+                WHERE r.question_id = q.id AND r.user_id = ?
+            ) AS has_responded
+            FROM questions q
+            ORDER BY q.id DESC
+        """, (user_id,))
         questions = c.fetchall()
     return questions
 
@@ -42,16 +57,18 @@ def init_db():
             CREATE TABLE IF NOT EXISTS responses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 question_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
                 response TEXT NOT NULL,
-                FOREIGN KEY(question_id) REFERENCES questions(id)
+                FOREIGN KEY(question_id) REFERENCES questions(id),
+                FOREIGN KEY(user_id) REFERENCES users(id)
             )
         ''')
-
+        # Create users table
         c.execute('''
             CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL
-        )
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL
+            )
         ''')
         conn.commit()
 
@@ -65,18 +82,19 @@ async def login(request: Request, username: str = Form(...)):
         conn.commit()
         c.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = c.fetchone()[0]
-    
+
     response = RedirectResponse("/", status_code=303)
     response.set_cookie(key="user_id", value=str(user_id), httponly=True)
     return response
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    questions = get_questions()
+    user_id = request.cookies.get("user_id")
+    questions = get_questions(user_id) if user_id else get_questions()
     return templates.TemplateResponse("home.html", {
         "request": request,
         "questions": questions,
-        "render_only_questions": False
+        "user_id": user_id
     })
 
 @app.post("/ask", response_class=HTMLResponse)
@@ -85,7 +103,8 @@ async def ask_question(request: Request, text: str = Form(...), type: str = Form
         c = conn.cursor()
         c.execute("INSERT INTO questions (text, type) VALUES (?, ?)", (text, type))
         conn.commit()
-    questions = get_questions()
+    user_id = request.cookies.get("user_id")
+    questions = get_questions(user_id) if user_id else get_questions()
     return templates.TemplateResponse("questions.html", {"request": request, "questions": questions})
 
 @app.get("/questions", response_class=HTMLResponse)
@@ -93,20 +112,14 @@ async def get_questions_partial(request: Request):
     questions = get_questions()
     return templates.TemplateResponse("questions.html", {"request": request, "questions": questions})
 
-@app.post("/ask", response_class=HTMLResponse)
-async def ask_question(request: Request, text: str = Form(...), type: str = Form(...)):
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("INSERT INTO questions (text, type) VALUES (?, ?)", (text, type))
-        conn.commit()
-    questions = get_questions()  # ← helper function needs no arguments
-    return templates.TemplateResponse("home.html", {"request": request, "questions": questions})
-
 @app.post("/respond", response_class=HTMLResponse)
 async def respond(request: Request, question_id: int = Form(...), response: str = Form(...)):
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return HTMLResponse("You must be logged in to respond.", status_code=403)
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("INSERT INTO responses (question_id, response) VALUES (?, ?)", (question_id, response))
+        c.execute("INSERT INTO responses (question_id, user_id, response) VALUES (?, ?, ?)", (question_id, user_id, response))
         conn.commit()
     return HTMLResponse("Thanks for responding!")
 
@@ -123,6 +136,12 @@ if not os.path.exists(home_html_path):
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 </head>
 <body>
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        <input type="text" name="username" required placeholder="Enter your name">
+        <button type="submit">Log in</button>
+    </form>
+
     <h1>Ask a Question</h1>
     <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
         <input type="text" name="text" required placeholder="Your question">
@@ -134,14 +153,7 @@ if not os.path.exists(home_html_path):
         <button type="submit">Ask</button>
     </form>
 
-    <div id="questions">
-        <h2>Recent Questions</h2>
-        <ul>
-        {% for id, text, type in questions %}
-            <li><strong>[{{ type }}]</strong> {{ text }}</li>
-        {% endfor %}
-        </ul>
-    </div>
+    {% include "questions.html" %}
 </body>
 </html>
 ''')
