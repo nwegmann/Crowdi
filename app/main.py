@@ -19,27 +19,37 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 # Initialize SQLite DB
 DB_PATH = os.path.join(BASE_DIR, "crowdi.db")
 
-# def get_questions():
-#     with sqlite3.connect(DB_PATH) as conn:
-#         c = conn.cursor()
-#         c.execute("SELECT id, text, type FROM questions ORDER BY id DESC")
-#         questions = c.fetchall()
-#     return questions
-
-def get_questions(user_id):
+def get_questions(user_id=None):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("""
-            SELECT q.id, q.text, q.type,
-            EXISTS (
-                SELECT 1 FROM responses r
-                WHERE r.question_id = q.id AND r.user_id = ?
-            ) AS has_responded
-            FROM questions q
-            ORDER BY q.id DESC
-        """, (user_id,))
+        if user_id:
+            c.execute("""
+                SELECT q.id, q.text, q.type,
+                EXISTS (
+                    SELECT 1 FROM responses r
+                    WHERE r.question_id = q.id AND r.user_id = ?
+                ) AS has_responded
+                FROM questions q
+                ORDER BY q.id DESC
+            """, (user_id,))
+        else:
+            c.execute("""
+                SELECT id, text, type, 0 AS has_responded
+                FROM questions
+                ORDER BY id DESC
+            """)
         questions = c.fetchall()
-    return questions
+
+        questions_with_options = []
+        for q in questions:
+            q_id, text, q_type, has_responded = q
+            opts = []
+            if q_type == "multiple":
+                c.execute("SELECT id, option_text FROM options WHERE question_id = ?", (q_id,))
+                opts = c.fetchall()
+            questions_with_options.append((q_id, text, q_type, has_responded, opts))
+            
+    return questions_with_options
 
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
@@ -70,6 +80,15 @@ def init_db():
                 username TEXT UNIQUE NOT NULL
             )
         ''')
+
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS options (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                question_id INTEGER NOT NULL,
+                option_text TEXT NOT NULL,
+                FOREIGN KEY(question_id) REFERENCES questions(id)
+            )
+        ''')
         conn.commit()
 
 init_db()
@@ -98,19 +117,25 @@ async def home(request: Request):
     })
 
 @app.post("/ask", response_class=HTMLResponse)
-async def ask_question(request: Request, text: str = Form(...), type: str = Form(...)):
+async def ask_question(request: Request, text: str = Form(...), type: str = Form(...), options: str = Form("")):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute("INSERT INTO questions (text, type) VALUES (?, ?)", (text, type))
+        question_id = c.lastrowid
+        
+        if type == "multiple" and options:
+            option_list = [opt.strip() for opt in options.split(",") if opt.strip()]
+            c.executemany(
+                "INSERT INTO options (question_id, option_text) VALUES (?, ?)",
+                [(question_id, opt) for opt in option_list]
+            )
+
         conn.commit()
+
     user_id = request.cookies.get("user_id")
     questions = get_questions(user_id) if user_id else get_questions()
     return templates.TemplateResponse("questions.html", {"request": request, "questions": questions})
 
-@app.get("/questions", response_class=HTMLResponse)
-async def get_questions_partial(request: Request):
-    questions = get_questions()
-    return templates.TemplateResponse("questions.html", {"request": request, "questions": questions})
 
 @app.post("/respond", response_class=HTMLResponse)
 async def respond(request: Request, question_id: int = Form(...), response: str = Form(...)):

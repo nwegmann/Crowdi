@@ -21,16 +21,26 @@
 
     <h1>Ask a Question</h1>
     <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
-        <input type="text" name="text" required placeholder="Your question">
+    <input type="text" name="text" required placeholder="Your question">
 
-        <select name="type" required>
-            <option value="text">Open Text</option>
-            <option value="yesno">Yes/No</option>
-            <option value="multiple">Multiple Choice</option>
-        </select>
+    <select name="type" required id="questionType">
+        <option value="text">Open Text</option>
+        <option value="yesno">Yes/No</option>
+        <option value="multiple">Multiple Choice</option>
+    </select>
 
-        <button type="submit">Ask</button>
-    </form>
+    <div id="multipleChoiceOptions" style="display: none;">
+        <input type="text" name="options" placeholder="Comma-separated options (e.g., Red,Blue,Green)">
+    </div>
+
+    <button type="submit">Ask</button>
+</form>
+
+<script>
+    document.getElementById("questionType").addEventListener("change", function () {
+        document.getElementById("multipleChoiceOptions").style.display = this.value === "multiple" ? "block" : "none";
+    });
+</script>
 
     {% include "questions.html" %}
 </body>
