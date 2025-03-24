@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+app/__init__.py
+app/main.py
+crowdi.egg-info/PKG-INFO
+crowdi.egg-info/SOURCES.txt
+crowdi.egg-info/dependency_links.txt
+crowdi.egg-info/requires.txt
+crowdi.egg-info/top_level.txt
