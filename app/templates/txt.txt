@@ -1,0 +1,31 @@
+To keep old code here if the new one satrts giving error. We can have a bacup of the old code in a separate file. This way we can keep the old code and still us
+HOME.html 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crowdi</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+</head>
+<body>
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        <input type="text" name="username" required placeholder="Enter your name">
+        <button type="submit">Log in</button>
+    </form>
+
+    <h1>Ask a Question</h1>
+    <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
+        <input type="text" name="text" required placeholder="Your question">
+        <select name="type" required>
+            <option value="text">Open Text</option>
+            <option value="yesno">Yes/No</option>
+            <option value="multiple">Multiple Choice</option>
+        </select>
+        <button type="submit">Ask</button>
+    </form>
+
+    {% include "questions.html" %}
+</body>
+</html>
