@@ -1,0 +1,166 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
+.main-content {
+    padding-top: 24px;
+}
+.main-content input,
+.main-content select,
+.main-content button {
+    font-family: 'Roboto', sans-serif;
+}
+
+.page-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 12px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.site-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.login-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-inline input {
+    font-family: 'Raleway', sans-serif;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.login-inline button {
+    font-family: 'Raleway', sans-serif;
+    padding: 6px 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.login-inline button:hover {
+    font-family: 'Raleway', sans-serif;
+    background: #0056b3;
+}
+
+.login-status {
+    font-size: 0.9rem;
+    color: #333;
+    background-color: #e9ecef;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.main-content {
+    flex: 1;
+    max-width: 700px;
+}
+
+.main-content h1 {
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+    font-size: 1.8rem;
+}
+
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    display: inline-block;
+    text-align: left;
+}
+
+#questions h2 {
+    font-family: 'Raleway', sans-serif;
+    text-align: center;
+    font-size: 1.8rem;
+}
+
+.question-form {
+    background: white;
+    padding: 25px;
+    margin: 30px auto;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* question list cards */
+.question-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    margin: 10px auto;
+    padding: 12px 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+}
+
+.question-type {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.response-form {
+    display: flex;
+    gap: 10px;
+}
+
+.response-form button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    border: none;
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+}
+
+.response-form button:hover {
+    background: #218838;
+}
+
+.already-responded {
+    font-style: italic;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.hidden {
+    display: none;
+}
