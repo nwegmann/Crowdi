@@ -1,29 +1,29 @@
 <div id="questions">
     <h2>Recent Questions</h2>
-    <ul>
-        {% for id, text, type, has_responded, options in questions %}
-        <li>
-            <strong>[{{ type }}]</strong> {{ text }}
-
+    {% for id, text, type, has_responded, options in questions %}
+    <div class="question-card">
+        <div class="question-info">
+            <div class="question-type">[{{ type }}]</div>
+            <div class="question-text">{{ text }}</div>
+        </div>
+        <div>
             {% if type == "yesno" and not has_responded %}
-            <form hx-post="/respond" hx-target="this" hx-swap="outerHTML">
+            <form class="response-form" hx-post="/respond" hx-target="this" hx-swap="outerHTML">
                 <input type="hidden" name="question_id" value="{{ id }}">
                 <button name="response" value="yes">👍 Yes</button>
                 <button name="response" value="no">👎 No</button>
             </form>
-
             {% elif type == "multiple" and not has_responded %}
-            <form hx-post="/respond" hx-target="this" hx-swap="outerHTML">
+            <form class="response-form" hx-post="/respond" hx-target="this" hx-swap="outerHTML">
                 <input type="hidden" name="question_id" value="{{ id }}">
                 {% for opt_id, opt_text in options %}
                 <button name="response" value="{{ opt_text }}">{{ opt_text }}</button>
                 {% endfor %}
             </form>
-
             {% elif has_responded %}
-            <p><em>You already responded.</em></p>
+            <p class="already-responded">You already responded.</p>
             {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+        </div>
+    </div>
+    {% endfor %}
 </div>

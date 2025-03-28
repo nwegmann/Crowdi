@@ -5,44 +5,60 @@
     <meta charset="UTF-8">
     <title>Crowdi</title>
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=1">
 </head>
 
 <body>
+    <header class="site-header">
+        <div class="site-title">Crowdi</div>
+        <div class="login-inline">
+            {% if not user_id %}
+            <form action="/login" method="post">
+                <input type="text" name="username" required placeholder="Your name">
+                <button type="submit">Log in</button>
+            </form>
+            {% else %}
+            <span class="login-status">👤 User #{{ user_id }}</span>
+            {% endif %}
+        </div>
+    </header>
 
-    {% if not user_id %}
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <input type="text" name="username" required placeholder="Enter your name">
-        <button type="submit">Log in</button>
-    </form>
-    {% else %}
-    <p>You are logged in as user #{{ user_id }}</p>
-    {% endif %}
+    <div class="page-container">
 
-    <h1>Ask a Question</h1>
-    <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
-    <input type="text" name="text" required placeholder="Your question">
 
-    <select name="type" required id="questionType">
-        <option value="text">Open Text</option>
-        <option value="yesno">Yes/No</option>
-        <option value="multiple">Multiple Choice</option>
-    </select>
+        <div class="main-content">
+            <h1>Ask a Question</h1>
+            <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
+                <input type="text" name="text" required placeholder="Your question">
 
-    <div id="multipleChoiceOptions" style="display: none;">
-        <input type="text" name="options" placeholder="Comma-separated options (e.g., Red,Blue,Green)">
+                <select name="type" required id="questionType">
+                    <option value="text">Open Text</option>
+                    <option value="yesno">Yes/No</option>
+                    <option value="multiple">Multiple Choice</option>
+                </select>
+
+                <div id="multipleChoiceOptions" class="hidden">
+                    <input type="text" name="options" placeholder="Comma-separated options (e.g., Red,Blue,Green)">
+                </div>
+
+                <button type="submit">Ask</button>
+            </form>
+
+            {% include "questions.html" %}
+        </div>
+
     </div>
 
-    <button type="submit">Ask</button>
-</form>
-
-<script>
-    document.getElementById("questionType").addEventListener("change", function () {
-        document.getElementById("multipleChoiceOptions").style.display = this.value === "multiple" ? "block" : "none";
-    });
-</script>
-
-    {% include "questions.html" %}
+    <script>
+        document.getElementById("questionType").addEventListener("change", function () {
+            const options = document.getElementById("multipleChoiceOptions");
+            options.classList.toggle("hidden", this.value !== "multiple");
+        });
+    </script>
 </body>
+
+</html>
 
 </html>
