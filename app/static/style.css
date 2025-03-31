@@ -1,10 +1,10 @@
-/* Colors:
-#150A2C
-#CF5C36
-#EFC88B
-#F4E3B2
-#F2ECE9
-*/
+:root {
+    --dar_purple: #150a2c;
+    --flame: #cf5c36;
+    --sunset: #efc88b;
+    --vanilla: #f4e3b2;
+    --isabelline: #f2ece9;
+}
 
 body {
     font-family: 'Roboto', sans-serif;
