@@ -79,3 +79,17 @@ def init_db():
             )
         ''')
         conn.commit()
+
+def add_response(question_id: int, response: str):
+    conn = sqlite3.connect(get_path())
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question_id INTEGER,
+            response TEXT
+        )
+    """)
+    c.execute("INSERT INTO responses (question_id, response) VALUES (?, ?)", (question_id, response))
+    conn.commit()
+    conn.close()

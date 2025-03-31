@@ -41,6 +41,7 @@ async def home(request: Request):
 async def ask_question(request: Request, text: str = Form(...), type: str = Form(...), options: str = Form("")):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
+        print("we are here")
         c.execute("INSERT INTO questions (text, type) VALUES (?, ?)", (text, type))
         question_id = c.lastrowid
         
@@ -55,8 +56,11 @@ async def ask_question(request: Request, text: str = Form(...), type: str = Form
 
     user_id = request.cookies.get("user_id")
     questions = db.get_questions(user_id) if user_id else db.get_questions()
-    return templates.TemplateResponse("questions.html", {"request": request, "questions": questions})
-
+    return templates.TemplateResponse("questions.html", {
+        "request": request,
+        "questions": questions,
+        "user_id": user_id
+    })
 
 @router.post("/respond", response_class=HTMLResponse)
 async def respond(request: Request, question_id: int = Form(...), response: str = Form(...)):

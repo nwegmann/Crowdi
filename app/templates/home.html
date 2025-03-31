@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Crowdi</title>
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.2"></script>
+    <link rel="stylesheet" href="/static/style.css?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css?v=1">
 </head>
 
@@ -30,7 +31,7 @@
 
         <div class="main-content">
             <h1>Ask a Question</h1>
-            <form hx-post="/ask" hx-target="#questions" hx-swap="outerHTML">
+            <form hx-post="/ask" method="post" hx-target="#questions" hx-swap="outerHTML">
                 <input type="text" name="text" required placeholder="Your question">
 
                 <select name="type" required id="questionType">
@@ -51,10 +52,35 @@
 
     </div>
 
+
     <script>
-        document.getElementById("questionType").addEventListener("change", function () {
+        document.addEventListener("DOMContentLoaded", function () {
+            const select = document.getElementById("questionType");
             const options = document.getElementById("multipleChoiceOptions");
-            options.classList.toggle("hidden", this.value !== "multiple");
+
+            select.addEventListener("change", function () {
+                options.classList.toggle("hidden", this.value !== "multiple");
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const select = document.getElementById("questionType");
+            const options = document.getElementById("multipleChoiceOptions");
+
+            // Initial state check (on load)
+            if (select.value === "multiple") {
+                options.classList.remove("hidden");
+            }
+
+            // Listen for changes
+            select.addEventListener("change", function () {
+                if (this.value === "multiple") {
+                    options.classList.remove("hidden");
+                } else {
+                    options.classList.add("hidden");
+                }
+            });
         });
     </script>
 </body>
