@@ -63,8 +63,13 @@ async def respond(request: Request, question_id: int = Form(...), response: str 
     user_id = request.cookies.get("user_id")
     if not user_id:
         return HTMLResponse("You must be logged in to respond.", status_code=403)
+
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("INSERT INTO responses (question_id, user_id, response) VALUES (?, ?, ?)", (question_id, user_id, response))
+        c.execute(
+            "INSERT INTO responses (question_id, user_id, response) VALUES (?, ?, ?)",
+            (question_id, user_id, response)
+        )
         conn.commit()
-    return HTMLResponse("Thanks for responding!")
+
+    return HTMLResponse(f"<p><strong>Your response:</strong> {response}</p>")

@@ -40,6 +40,12 @@ def get_questions(user_id=None):
             
     return questions_with_options
 
+def get_responses(question_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT response FROM responses WHERE question_id = ?", (question_id,))
+        return [row[0] for row in c.fetchall()]
+
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
