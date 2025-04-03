@@ -11,6 +11,7 @@ def get_path():
 def get_questions(user_id=None):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
+
         if user_id:
             c.execute("""
                 SELECT q.id, q.text, q.type,
@@ -27,18 +28,26 @@ def get_questions(user_id=None):
                 FROM questions
                 ORDER BY id DESC
             """)
-        questions = c.fetchall()
 
-        questions_with_options = []
+        questions = c.fetchall()
+        questions_full = []
+
         for q in questions:
             q_id, text, q_type, has_responded = q
+
+            # Get options if multiple choice
             opts = []
             if q_type == "multiple":
                 c.execute("SELECT id, option_text FROM options WHERE question_id = ?", (q_id,))
                 opts = c.fetchall()
-            questions_with_options.append((q_id, text, q_type, has_responded, opts))
-            
-    return questions_with_options
+
+            # Get all responses
+            c.execute("SELECT response FROM responses WHERE question_id = ?", (q_id,))
+            responses = [row[0] for row in c.fetchall()]
+
+            questions_full.append((q_id, text, q_type, has_responded, opts, responses))
+
+        return questions_full
 
 def get_responses(question_id):
     with sqlite3.connect(DB_PATH) as conn:
