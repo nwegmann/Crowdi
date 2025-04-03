@@ -1,6 +1,6 @@
 <div id="questions">
     <h2>Recent Questions</h2>
-    {% for id, text, type, has_responded, options, responses in questions %}
+{% for id, text, type, has_responded, options, responses in questions %}
     <div class="question-card">
         <div class="question-info">
             <div class="question-type">[{{ type }}]</div>
