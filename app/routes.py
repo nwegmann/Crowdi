@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from . import service
 import app.db as db
 import sqlite3
 import os
@@ -30,11 +31,11 @@ async def login(request: Request, username: str = Form(...)):
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     user_id = request.cookies.get("user_id")
-    questions = db.get_questions(user_id) if user_id else db.get_questions()
+    questions = service.get_questions_with_data(user_id)
     return templates.TemplateResponse("home.html", {
         "request": request,
-        "questions": questions,
-        "user_id": user_id
+        "user_id": user_id,
+        "questions": questions
     })
 
 @router.post("/ask", response_class=HTMLResponse)
