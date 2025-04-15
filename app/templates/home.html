@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Crowdi</title>
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.2"></script>
+    <title>Crowdi - Item Lending Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.2"></script>
     <link rel="stylesheet" href="/static/style.css?v=1">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -13,76 +13,124 @@
 
 <body>
     <header class="site-header">
-        <div class="site-title">Crowdi</div>
-        <div class="login-inline">
+        <div class="title-section">
+            <div class="site-title">Crowdi</div>
+        </div>
+
+        {% if user_id %}
+        <div class="tabs-section">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('borrow')">Borrow Items</button>
+                <button class="tab" onclick="switchTab('lend')">My Lending</button>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="login-section">
             {% if not user_id %}
             <form action="/login" method="post">
                 <input type="text" name="username" required placeholder="Your name">
                 <button type="submit">Log in</button>
             </form>
             {% else %}
-            <span class="login-status">👤 User #{{ user_id }}</span>
+            <span class="login-status"> {{ username }}</span>
             {% endif %}
         </div>
     </header>
 
+    {% if user_id %}
     <div class="page-container">
-
-
-        <div class="main-content">
-            <h1>Ask a Question</h1>
-            <form hx-post="/ask" method="post" hx-target="#questions" hx-swap="outerHTML">
-                <input type="text" name="text" required placeholder="Your question">
-
-                <select name="type" required id="questionType">
-                    <option value="text">Open Text</option>
-                    <option value="yesno">Yes/No</option>
-                    <option value="multiple">Multiple Choice</option>
-                </select>
-
-                <div id="multipleChoiceOptions" class="hidden">
-                    <input type="text" name="options" placeholder="Comma-separated options (e.g., Red,Blue,Green)">
-                </div>
-
-                <button type="submit">Ask</button>
-            </form>
-
-            {% include "questions.html" %}
+        <div id="borrow-tab" class="tab-content active">
+            <h2>Available Items to Borrow</h2>
+            <div class="item-grid">
+                {% if items %}
+                    {% for item in items %}
+                    <div class="item-card">
+                        <h3>{{ item[1] }}</h3>
+                        <p>{{ item[2] }}</p>
+                        <p>Owner: {{ item[5] }}</p>
+                        <form action="/borrow" method="post">
+                            <input type="hidden" name="item_id" value="{{ item[0] }}">
+                            <button type="submit">Borrow</button>
+                        </form>
+                        {% if item[4] %}
+                        <p>
+                            {% for tag in item[4].split() %}
+                            <span class="hashtag">#{{ tag.strip('#') }}</span>
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No items available for borrowing</p>
+                {% endif %}
+            </div>
         </div>
 
+        <div id="lend-tab" class="tab-content">
+            <div class="form-container">
+                <h2>Add New Item</h2>
+                <form action="/add_item" method="post">
+                    <div>
+                        <input type="text" name="name" placeholder="Item Name" required>
+                    </div>
+                    <div>
+                        <textarea name="description" placeholder="Description" required></textarea>
+                    </div>
+                    <div>
+                        <input type="text" name="hashtags" placeholder="#electronics #books">
+                    </div>
+                    <button type="submit">Add Item</button>
+                </form>
+            </div>
+            
+            <h2>My Items</h2>
+            <div class="item-grid">
+                {% if my_items %}
+                {% for item in my_items %}
+                <div class="item-card">
+                    <h3>{{ item[1] }}</h3>
+                    <p>{{ item[2] }}</p>
+                    <p>Status: {{ item[3] }}</p>
+                    {% if item[4] %}
+                    <p>
+                        {% for tag in item[4].split() %}
+                            <span class="hashtag">#{{ tag.strip('#') }}</span>
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const select = document.getElementById("questionType");
-            const options = document.getElementById("multipleChoiceOptions");
-
-            select.addEventListener("change", function () {
-                options.classList.toggle("hidden", this.value !== "multiple");
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
             });
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const select = document.getElementById("questionType");
-            const options = document.getElementById("multipleChoiceOptions");
-
-            // Initial state check (on load)
-            if (select.value === "multiple") {
-                options.classList.remove("hidden");
-            }
-
-            // Listen for changes
-            select.addEventListener("change", function () {
-                if (this.value === "multiple") {
-                    options.classList.remove("hidden");
-                } else {
-                    options.classList.add("hidden");
-                }
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
             });
-        });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
     </script>
+    {% else %}
+    <div class="form-container">
+        <h2>Login</h2>
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="Username" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    {% endif %}
 </body>
 
 </html>

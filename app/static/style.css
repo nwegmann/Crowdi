@@ -25,23 +25,26 @@ body {
 }
 
 .page-container {
+    font-family: 'Raleway', sans-serif;
     display: flex;
     align-items: flex-start;
     justify-content: center;
     gap: 40px;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
+    
 }
+
 .site-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #CF5C36;
     padding: 12px 24px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 .site-title {
     font-family: 'Raleway', sans-serif;
@@ -77,13 +80,13 @@ body {
 
 .login-inline button:hover {
     font-family: 'Raleway', sans-serif;
-    background: #150A2C;
+    background: var(--dar_purple);
 }
 
 .login-status {
     font-size: 0.9rem;
-    color: #333;
-    background-color: #e9ecef;
+    color:var(--dar_purple);
+    background-color: var(--vanilla);
     padding: 6px 10px;
     border-radius: 4px;
 }
@@ -98,84 +101,172 @@ body {
     font-weight: bold;
     text-align: center;
     font-size: 1.8rem;
-    color: white;
+    color: var(--isabelline);
 }
 
 form {
     background: #F4E3B2;
     padding: 20px;
-    border-radius: 8px;
     display: inline-block;
     text-align: left;
     font-weight: bold;
 }
 
-#questions h2 {
-    font-family: 'Raleway', sans-serif;
-    font-weight: bold;
-    text-align: center;
-    font-size: 1.8rem;
-    color: white;
-}
-
-.question-form {
-    background: #EFC88B;
-    padding: 25px;
-    margin: 30px auto;
-    max-width: 600px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    text-align: left;
+.item-card {
     font-family: 'Roboto', sans-serif;
-    font-weight: bold;
-}
-
-/* question list cards */
-.question-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #F4E3B2;
-    margin: 10px auto;
-    padding: 12px 18px;
+    box-sizing: border-box;
+    background-color: var(--vanilla);
+    border: 10px solid var(--isabelline);
+    padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    max-width: 600px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.question-type {
-    font-weight: bold;
-    font-size: 0.8rem;
-    color: #888;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-}
+ .item-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+     gap: 20px;
+     padding: 20px;
+ }
 
-.response-form {
-    display: flex;
-    gap: 10px;
-}
+ .form-container {
+     max-width: 500px;
+     margin: 20px auto;
+     padding: 20px;
+ }
 
-.response-form button {
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    border-radius: 5px;
-    border: none;
-    background: #150A2C;
-    color: white;
-    cursor: pointer;
-}
+ .tabs {
+     display: flex;
+     margin: 20px 0;
+     border-bottom: 2px solid #ddd;
+ }
 
-.response-form button:hover {
-    background: #150A2C;
-}
+ .tab {
+     padding: 10px 20px;
+     cursor: pointer;
+     border: none;
+     background: none;
+     font-size: 16px;
+     color: var(--isabelline);
+ }
 
-.already-responded {
-    font-style: italic;
-    color: #888;
-    font-size: 0.9rem;
-}
+ .tab.active {
+     border-bottom: 2px solid #150a2c;
+     margin-bottom: -2px;
+     color: #150a2c;
+     font-weight: bold;
+ }
+
+ .tab-content {
+     display: none;
+     width: 100%;
+ }
+
+ .tab-content.active {
+     display: block;
+ }
+
+ .site-header {
+     padding: 1rem 2rem;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     background-color: #cf5c36;
+ }
+
+ .header-section {
+     display: flex;
+     align-items: center;
+     gap: 2rem;
+ }
+
+ .title-section {
+     flex: 0 0 auto;
+     min-width: 250px;
+     text-align: left;
+     order: 1;
+ }
+
+ .tabs-section {
+     flex: 1;
+     display: flex;
+     justify-content: center;
+     order: 2;
+ }
+
+ .login-section {
+     flex: 0 0 auto;
+     min-width: 250px;
+     text-align: right;
+     order: 3;
+ }
+
+ .login-inline input {
+     padding: 8px 12px;
+     border: none;
+     border-radius: 4px;
+ }
+
+ .login-inline button {
+     padding: 8px 16px;
+     background-color: white;
+     color: #150a2c;
+     border: none;
+     border-radius: 4px;
+     font-weight: bold;
+     cursor: pointer;
+ }
+
+ .form-container {
+     background-color: var(--vanilla);
+     border: 8px solid var(--isabelline);
+     border-radius: 12px;
+     padding: 24px;
+     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+     max-width: 600px;
+     margin: 20px auto;
+     font-family: 'Roboto', sans-serif;
+ }
+
+ .form-container input,
+ .form-container textarea {
+     width: 100%;
+     padding: 12px;
+     font-size: 1rem;
+     border: 1px solid #ccc;
+     border-radius: 6px;
+     font-family: 'Roboto', sans-serif;
+ }
+
+ .form-container textarea {
+     resize: vertical;
+     min-height: 100px;
+ }
+
+ .form-container button {
+     background-color: var(--flame);
+     color: white;
+     font-weight: bold;
+     padding: 10px 20px;
+     border: none;
+     border-radius: 6px;
+     cursor: pointer;
+     font-family: 'Raleway', sans-serif;
+     transition: background-color 0.2s ease;
+    display: block;
+    margin: 20px auto 0;
+ }
 
 .hidden {
     display: none;
+}
+
+.hashtag {
+    display: inline-block;
+    background-color: var(--flame);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+    font-size: 0.8rem;
 }

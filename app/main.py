@@ -16,11 +16,10 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
 DB_PATH = db.get_path()
+db.init_db()
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
-
-db.init_db()
 app.include_router(route_handlers)
 
 # Create template file if not exists
