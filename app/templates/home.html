@@ -41,6 +41,16 @@
     {% if user_id %}
     <div class="page-container">
         <div id="borrow-tab" class="tab-content active">
+            <form id="filter-form" style="margin-bottom: 20px;">
+                <input 
+                    type="text" 
+                    id="hashtag" 
+                    name="hashtag" 
+                    placeholder="Filter by hashtag (e.g. #electronics)"
+                    value=""
+                >
+                <button type="submit">Filter</button>
+            </form>
             <h2>Available Items to Borrow</h2>
             <div class="item-grid">
                 {% if items %}
@@ -54,7 +64,7 @@
                             <button type="submit">Borrow</button>
                         </form>
                         {% if item[4] %}
-                        <p>
+                        <p class="hashtag-list">
                             {% for tag in item[4].split() %}
                             <span class="hashtag">#{{ tag.strip('#') }}</span>
                             {% endfor %}
@@ -106,22 +116,37 @@
             </div>
         </div>
     </div>
-
+    
     <script>
-        function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterForm = document.getElementById('filter-form');
+            const hashtagInput = document.getElementById('hashtag');
+            const items = document.querySelectorAll('.item-card');
+    
+            function filterItems() {
+                const filter = hashtagInput.value.trim().toLowerCase().replace(/^#/, '');
+    
+                items.forEach(item => {
+                    const hashtags = Array.from(item.querySelectorAll('.hashtag'))
+                        .map(tag => tag.textContent.toLowerCase().replace(/^#/, ''));
+    
+                    if (filter === '' || hashtags.includes(filter)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+    
+            // Prevent form submission
+            filterForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                filterItems();
             });
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-        }
+    
+        });
     </script>
+    
     {% else %}
     <div class="form-container">
         <h2>Login</h2>

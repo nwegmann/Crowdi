@@ -27,6 +27,7 @@ async def login(request: Request, username: str = Form(...)):
     response.set_cookie(key="username", value=username)
     return response
 
+
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     user_id = request.cookies.get("user_id")
@@ -34,12 +35,18 @@ async def home(request: Request):
     items = []
     my_items = []
     
+    # Debugging: Print user_id to check its value
+    print(f"User ID: {user_id}")
+
     if user_id:
         try:
             user_id_int = int(user_id)
         except ValueError:
             return HTMLResponse("Invalid user ID cookie.", status_code=400)
-            
+
+        # Debugging: Ensure user_id_int is correct
+        print(f"User ID (as integer): {user_id_int}")    
+
         with sqlite3.connect(DB_PATH) as conn:
             c = conn.cursor()
             # Debug: Print column names
@@ -61,6 +68,9 @@ async def home(request: Request):
             """, (user_id_int,))
             items = c.fetchall()
             print("Available items for user:", items)
+
+            # Debugging: Print available items for user
+            print(f"Available items for user: {items}")
             
             # Get user's own items
             c.execute("""
