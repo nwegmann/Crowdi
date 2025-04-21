@@ -34,6 +34,9 @@
             </form>
             {% else %}
             <span class="login-status"> {{ username }}</span>
+            <form action="/logout" method="post">
+                <button type="submit">Sign out</button>
+            </form>
             {% endif %}
         </div>
     </header>
@@ -118,6 +121,17 @@
     </div>
     
     <script>
+        function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
         document.addEventListener('DOMContentLoaded', function () {
             const filterForm = document.getElementById('filter-form');
             const hashtagInput = document.getElementById('hashtag');

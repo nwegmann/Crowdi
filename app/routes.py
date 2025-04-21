@@ -133,3 +133,11 @@ async def borrow_item(request: Request, item_id: int = Form(...)):
         conn.commit()
 
     return RedirectResponse("/", status_code=303)
+
+@router.post("/logout", response_class=HTMLResponse)
+async def logout(request: Request):
+    response = RedirectResponse("/", status_code=303)
+    response.delete_cookie("user_id")
+    response.delete_cookie("username")
+    return response
+
