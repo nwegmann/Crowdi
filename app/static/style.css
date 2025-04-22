@@ -17,6 +17,7 @@ body {
 .main-content {
     padding-top: 24px;
 }
+
 .main-content input,
 .main-content select,
 .main-content button {
@@ -32,7 +33,7 @@ body {
     gap: 40px;
     max-width: 100%;
     margin: 0 auto;
-    
+
 }
 
 .site-header {
@@ -46,6 +47,7 @@ body {
     z-index: 100;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+
 .site-title {
     font-family: 'Raleway', sans-serif;
     font-size: 2.2rem;
@@ -85,7 +87,7 @@ body {
 
 .login-status {
     font-size: 0.9rem;
-    color:var(--dar_purple);
+    color: var(--dar_purple);
     background-color: var(--vanilla);
     padding: 6px 10px;
     border-radius: 4px;
@@ -122,140 +124,147 @@ form {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
- .item-grid {
-     display: grid;
-     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-     gap: 20px;
-     padding: 20px;
- }
+.item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
 
- .form-container {
-     max-width: 500px;
-     margin: 20px auto;
-     padding: 20px;
- }
+.form-container {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+}
 
- .tabs {
-     display: flex;
-     margin: 20px 0;
-     border-bottom: 2px solid #ddd;
- }
+.tabs {
+    display: flex;
+    justify-content: flex-end;
+    /* align to the right */
+    gap: 10px;
+    margin: 20px 0;
+}
 
- .tab {
-     padding: 10px 20px;
-     cursor: pointer;
-     border: none;
-     background: none;
-     font-size: 16px;
-     color: var(--isabelline);
- }
+.tab {
+    padding: 8px 16px;
+    background-color: var(--flame);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-family: 'Raleway', sans-serif;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
 
- .tab.active {
-     border-bottom: 2px solid #150a2c;
-     margin-bottom: -2px;
-     color: #150a2c;
-     font-weight: bold;
- }
+.tab:hover {
+    background-color: var(--dar_purple);
+}
 
- .tab-content {
-     display: none;
-     width: 100%;
- }
+.tab.active {
+    color: white;
+    font-weight: bold;
+}
 
- .tab-content.active {
-     display: block;
- }
+.tab-content {
+    display: none;
+    width: 100%;
+}
 
- .site-header {
-     padding: 1rem 2rem;
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
-     background-color: #cf5c36;
- }
+.tab-content.active {
+    display: block;
+}
 
- .header-section {
-     display: flex;
-     align-items: center;
-     gap: 2rem;
- }
+.site-header {
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #cf5c36;
+}
 
- .title-section {
-     flex: 0 0 auto;
-     min-width: 250px;
-     text-align: left;
-     order: 1;
- }
+.header-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
 
- .tabs-section {
-     flex: 1;
-     display: flex;
-     justify-content: center;
-     order: 2;
- }
+.title-section {
+    flex: 0 0 auto;
+    min-width: 250px;
+    text-align: left;
+    order: 1;
+}
 
- .login-section {
-     flex: 0 0 auto;
-     min-width: 250px;
-     text-align: right;
-     order: 3;
- }
+.tabs-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    order: 2;
+}
 
- .login-inline input {
-     padding: 8px 12px;
-     border: none;
-     border-radius: 4px;
- }
+.login-section {
+    flex: 0 0 auto;
+    min-width: 250px;
+    text-align: right;
+    order: 3;
+}
 
- .login-inline button {
-     padding: 8px 16px;
-     background-color: white;
-     color: #150a2c;
-     border: none;
-     border-radius: 4px;
-     font-weight: bold;
-     cursor: pointer;
- }
+.login-inline input {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+}
 
- .form-container {
-     background-color: var(--vanilla);
-     border: 8px solid var(--isabelline);
-     border-radius: 12px;
-     padding: 24px;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-     max-width: 600px;
-     margin: 20px auto;
-     font-family: 'Roboto', sans-serif;
- }
+.login-inline button {
+    padding: 8px 16px;
+    background-color: white;
+    color: #150a2c;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
- .form-container input,
- .form-container textarea {
-     width: 100%;
-     padding: 12px;
-     font-size: 1rem;
-     border: 1px solid #ccc;
-     border-radius: 6px;
-     font-family: 'Roboto', sans-serif;
- }
+.form-container {
+    background-color: var(--vanilla);
+    border: 8px solid var(--isabelline);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: 'Roboto', sans-serif;
+}
 
- .form-container textarea {
-     resize: vertical;
-     min-height: 100px;
- }
+.form-container input,
+.form-container textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: 'Roboto', sans-serif;
+}
 
- .form-container button {
-     background-color: var(--flame);
-     color: white;
-     font-weight: bold;
-     padding: 10px 20px;
-     border: none;
-     border-radius: 6px;
-     cursor: pointer;
-     font-family: 'Raleway', sans-serif;
-     transition: background-color 0.2s ease;
+.form-container textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-container button {
+    background-color: var(--flame);
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    transition: background-color 0.2s ease;
     display: block;
     margin: 20px auto 0;
- }
+}
 
 .hidden {
     display: none;
@@ -269,4 +278,115 @@ form {
     border-radius: 4px;
     margin-right: 4px;
     font-size: 0.8rem;
+}
+
+/* Conversation List */
+.conversation-list {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.conversation-item {
+    background-color: var(--vanilla);
+    border: 2px solid var(--isabelline);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.conversation-item:hover {
+    background-color: var(--sunset);
+}
+
+/* Chat Window */
+.chat-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: var(--vanilla);
+    border: 2px solid var(--isabelline);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.message {
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 75%;
+    clear: both;
+    line-height: 1.4;
+}
+
+.message.sent {
+    background-color: var(--sunset);
+    color: white;
+    float: right;
+}
+
+.message.received {
+    background-color: var(--isabelline);
+    color: var(--dar_purple);
+    float: left;
+}
+
+.message small {
+    display: block;
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+.message-form {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.message-form textarea {
+    flex: 1;
+    padding: 10px;
+    font-family: 'Roboto', sans-serif;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.message-form button {
+    padding: 10px 16px;
+    background-color: var(--flame);
+    color: var(--isabelline);
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    transition: background-color 0.2s ease;
+}
+
+.message-form button:hover {
+    background-color: var(--dar_purple);
+}
+
+.login-section form[action="/logout"] {
+    display: inline;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.login-section form[action="/logout"] button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: normal;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
 }

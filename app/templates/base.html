@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Crowdi - Item Lending Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.2"></script>
+    <link rel="stylesheet" href="/static/style.css?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=1">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="title-section">
+            <div class="site-title">Crowdi</div>
+        </div>
+
+        <div class="tabs-section">
+            <div class="tabs">
+                <a href="/" class="tab">Home</a>
+                <a href="/conversations" class="tab">Messages</a>
+            </div>
+        </div>
+
+        <div class="login-section">
+            {% if not user_id %}
+            <form action="/login" method="post" class="login-inline">
+                <input type="text" name="username" placeholder="Your name" required>
+                <button type="submit">Log in</button>
+            </form>
+            {% else %}
+            <span class="login-status">{{ username }}</span>
+            <form action="/logout" method="post" style="display: inline;">
+                <button type="submit">Sign out</button>
+            </form>
+            {% endif %}
+        </div>
+    </header>
+    {% block content %}{% endblock %}
+</body>
+
+</html>

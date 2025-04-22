@@ -42,4 +42,30 @@ def init_db():
                 FOREIGN KEY(borrower_id) REFERENCES users(id)
             )
         ''')
+                # Conversations
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS conversations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user1_id INTEGER NOT NULL,
+                user2_id INTEGER NOT NULL,
+                item_id INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user1_id) REFERENCES users(id),
+                FOREIGN KEY (user2_id) REFERENCES users(id),
+                FOREIGN KEY (item_id) REFERENCES items(id)
+            )
+        ''')
+
+        # Messages
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                conversation_id INTEGER NOT NULL,
+                sender_id INTEGER NOT NULL,
+                content TEXT NOT NULL,
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (conversation_id) REFERENCES conversations(id),
+                FOREIGN KEY (sender_id) REFERENCES users(id)
+            )
+        ''')
         conn.commit()
