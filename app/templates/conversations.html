@@ -12,10 +12,10 @@
         {% endif %}
         <strong>Chat with {% if convo.user1 == user_id %}{{ convo.username2 }}{% else %}{{ convo.username1 }}{% endif
             %}</strong><br>
-        <small>Started {{ convo.created_at }}</small><br>
         {% if convo.item_name %}
-        <small><em>Item: {{ convo.item_name }}</em></small>
+        <small>Item: {{ convo.item_name }}</small><br>
         {% endif %}
+        <small>Started {{ convo.created_at }}</small>
     </a>
     {% endfor %}
     {% else %}
