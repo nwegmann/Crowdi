@@ -62,10 +62,24 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 conversation_id INTEGER NOT NULL,
                 sender_id INTEGER NOT NULL,
+                recipient_id INTEGER,
                 content TEXT NOT NULL,
                 sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                seen INTEGER DEFAULT 0,
                 FOREIGN KEY (conversation_id) REFERENCES conversations(id),
-                FOREIGN KEY (sender_id) REFERENCES users(id)
+                FOREIGN KEY (sender_id) REFERENCES users(id),
+                FOREIGN KEY (recipient_id) REFERENCES users(id)
+            )
+        ''')
+        # Requested items
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS requested_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
             )
         ''')
         conn.commit()

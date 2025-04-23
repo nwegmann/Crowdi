@@ -82,13 +82,14 @@ body {
 
 .login-inline button:hover {
     font-family: 'Raleway', sans-serif;
+    color: white;
     background: var(--dar_purple);
 }
 
 .login-status {
     font-size: 0.9rem;
-    color: var(--dar_purple);
-    background-color: var(--vanilla);
+    color: var(--isabelline);
+    background-color: var(--dar_purple);
     padding: 6px 10px;
     border-radius: 4px;
 }
@@ -302,13 +303,20 @@ form {
     background-color: var(--sunset);
 }
 
-/* Chat Window */
+.conversation-layout {
+    display: flex;
+    justify-content: center;
+    height: 80vh;
+    gap: 20px;
+    margin-top: 24px;
+    width: 100%;
+}
+
 .chat-container {
     max-width: 700px;
-    margin: 0 auto;
     background-color: var(--vanilla);
-    border: 2px solid var(--isabelline);
-    border-radius: 10px;
+    border: 8px solid var(--isabelline);
+    border-radius: 12px;
     padding: 20px;
     font-family: 'Roboto', sans-serif;
 }
@@ -389,4 +397,81 @@ form {
     padding: 0;
     cursor: pointer;
     text-decoration: underline;
+}
+
+.notification-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: var(--dar_purple);
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.conversation-card {
+    display: block;
+    padding: 12px;
+    background-color: var(--vanilla);
+    border: 8px solid var(--isabelline);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 12px;
+}
+
+.conversation-card:hover {
+    border-color: var(--dar_purple);
+}
+
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--isabelline);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+.filter-button {
+    padding: 8px 16px;
+    background-color: var(--flame);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.filter-button:hover {
+    background-color: #b84a2c;
+}
+
+.messages-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.logout-section {
+    align-items: center;
+    gap: 10px;
+}
+
+.login-section {
+    padding-right: 10px;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
 }

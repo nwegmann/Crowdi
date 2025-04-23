@@ -5,12 +5,18 @@
     <h2>Your Conversations</h2>
 
     {% if conversations %}
-    {% for convo_id, user1, user2, created_at in conversations %}
-    <div class="conversation-item">
-        <a href="/conversations/{{ convo_id }}">
-            Chat with {{ user2 if user1 == username else user1 }} (started {{ created_at }})
-        </a>
-    </div>
+    {% for convo in conversations %}
+    <a href="/conversations/{{ convo.id }}" class="conversation-link conversation-card">
+        {% if convo.has_unread %}
+        <span class="notification-dot"></span>
+        {% endif %}
+        <strong>Chat with {% if convo.user1 == user_id %}{{ convo.username2 }}{% else %}{{ convo.username1 }}{% endif
+            %}</strong><br>
+        <small>Started {{ convo.created_at }}</small><br>
+        {% if convo.item_name %}
+        <small><em>Item: {{ convo.item_name }}</em></small>
+        {% endif %}
+    </a>
     {% endfor %}
     {% else %}
     <p>You don't have any conversations yet.</p>

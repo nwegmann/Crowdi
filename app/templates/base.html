@@ -17,12 +17,20 @@
             <div class="site-title">Crowdi</div>
         </div>
 
+        {% if user_id %}
         <div class="tabs-section">
             <div class="tabs">
                 <a href="/" class="tab">Home</a>
-                <a href="/conversations" class="tab">Messages</a>
+                <a href="/conversations" class="tab messages-tab">
+                    Messages
+                    <span id="notification-badge" hx-get="/notifications" hx-trigger="load, every 2s"
+                        hx-swap="outerHTML" class="notification-dot-wrapper">
+                        <!-- Notification dot will be replaced here -->
+                    </span>
+                </a>
             </div>
         </div>
+        {% endif %}
 
         <div class="login-section">
             {% if not user_id %}
@@ -31,10 +39,12 @@
                 <button type="submit">Log in</button>
             </form>
             {% else %}
-            <span class="login-status">{{ username }}</span>
-            <form action="/logout" method="post" style="display: inline;">
-                <button type="submit">Sign out</button>
-            </form>
+            <div class="logout-section">
+                <span class="login-status">{{ username }}</span>
+                <form action="/logout" method="post">
+                    <button type="submit" class="logout-button">Sign out</button>
+                </form>
+            </div>
             {% endif %}
         </div>
     </header>

@@ -16,20 +16,20 @@
 <body>
 
     {% if user_id %}
-    {% block tabs_section %}
     <div class="tabs-section">
         <div class="tabs">
             <button class="tab active" onclick="switchTab('borrow')">Borrow Items</button>
+            <button class="tab" onclick="switchTab('requests')">Requested Items</button>
+            <button class="tab" onclick="switchTab('my-requests')">My Requests</button>
             <button class="tab" onclick="switchTab('lend')">My Lending</button>
         </div>
     </div>
-    {% endblock %}
     <div class="page-container">
         <div id="borrow-tab" class="tab-content active">
-            <form id="filter-form" style="margin-bottom: 20px;">
+            <form id="filter-form" class="filter-form">
                 <input type="text" id="hashtag" name="hashtag" placeholder="Filter by hashtag (e.g. #electronics)"
-                    value="">
-                <button type="submit">Filter</button>
+                    value="" class="filter-input">
+                <button type="submit" class="filter-button">Filter</button>
             </form>
             <h2>Available Items to Borrow</h2>
             <div class="item-grid">
@@ -59,6 +59,55 @@
                 {% endfor %}
                 {% else %}
                 <p>No items available for borrowing</p>
+                {% endif %}
+            </div>
+        </div>
+        <div id="requests-tab" class="tab-content">
+            <h2>Requested Items</h2>
+            <div class="item-grid">
+                {% if requested_items %}
+                {% for req in requested_items %}
+                <div class="item-card">
+
+                    <h3>{{ req[1] }}</h3>
+                    <p>{{ req[2] }}</p>
+                    <p>Requester: {{ req[4] }}</p>
+                    {% if user_id and req[3] != user_id %}
+
+                    <form method="post" action="/start_conversation">
+                        <input type="hidden" name="item_id" value="{{ req[0] }}">
+                        <input type="hidden" name="other_user_id" value="{{ req[3] }}">
+                        <button type="submit">Contact</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>No item requests yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="my-requests-tab" class="tab-content">
+            <div class="form-container">
+                <h2>Request an Item</h2>
+                <form action="/add_request" method="post">
+                    <input type="text" name="title" placeholder="What do you need?" required>
+                    <textarea name="description" placeholder="Describe your request..." required></textarea>
+                    <button type="submit">Post Request</button>
+                </form>
+            </div>
+            <h2>My Requests</h2>
+            <div class="item-grid">
+                {% if my_requests %}
+                {% for req in my_requests %}
+                <div class="item-card">
+                    <h3>{{ req[1] }}</h3>
+                    <p>{{ req[2] }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>You haven’t requested any items yet.</p>
                 {% endif %}
             </div>
         </div>

@@ -34,6 +34,8 @@ async def home(request: Request):
     username = request.cookies.get("username")
     items = []
     my_items = []
+    requested_items = []
+    my_requests = []
     
     # Debugging: Print user_id to check its value
     print(f"User ID: {user_id}")
@@ -81,6 +83,21 @@ async def home(request: Request):
             """, (user_id_int,))
             my_items = c.fetchall()
             print("User's items:", my_items)
+
+            # Get requested items
+            c.execute("""
+                SELECT r.id, r.title, r.description, r.user_id, u.username
+                FROM requested_items r
+                JOIN users u ON r.user_id = u.id
+            """)
+            requested_items = c.fetchall()
+
+            c.execute("""
+                SELECT id, title, description
+                FROM requested_items
+                WHERE user_id = ?
+            """, (user_id,))
+            my_requests = c.fetchall()
     
     return templates.TemplateResponse(
         "home.html",
@@ -89,7 +106,9 @@ async def home(request: Request):
             "user_id": user_id,
             "username": username,
             "items": items,
-            "my_items": my_items
+            "my_items": my_items,
+            "requested_items": requested_items,
+            "my_requests": my_requests
         }
     )
 
@@ -152,14 +171,41 @@ async def list_conversations(request: Request):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute("""
-            SELECT c.id, u1.username, u2.username, c.created_at
+            SELECT c.id, u1.username, u2.username, c.created_at, c.user1_id, c.user2_id
             FROM conversations c
             JOIN users u1 ON c.user1_id = u1.id
             JOIN users u2 ON c.user2_id = u2.id
             WHERE c.user1_id = ? OR c.user2_id = ?
             ORDER BY c.created_at DESC
         """, (user_id, user_id))
-        conversations = c.fetchall()
+        rows = c.fetchall()
+
+        conversations = []
+        for convo_id, u1, u2, created_at, user1_id, user2_id in rows:
+            c.execute("""
+                SELECT COUNT(*) FROM messages
+                WHERE conversation_id = ? AND recipient_id = ? AND seen = 0
+            """, (convo_id, user_id))
+            unread_count = c.fetchone()[0]
+            has_unread = unread_count > 0
+            # Try to get item name from items or requested_items
+            c.execute("SELECT name FROM items WHERE id = (SELECT item_id FROM conversations WHERE id = ?)", (convo_id,))
+            item = c.fetchone()
+            if not item:
+                c.execute("SELECT title FROM requested_items WHERE id = (SELECT item_id FROM conversations WHERE id = ?)", (convo_id,))
+                item = c.fetchone()
+            item_name = item[0] if item else None
+            conversations.append({
+                "id": convo_id,
+                "user1": user1_id,
+                "user2": user2_id,
+                "username1": u1,
+                "username2": u2,
+                "created_at": created_at,
+                "has_unread": has_unread,
+                "item_name": item_name
+            })
+
         # Get username
         c.execute("SELECT username FROM users WHERE id = ?", (user_id,))
         row = c.fetchone()
@@ -175,7 +221,11 @@ async def list_conversations(request: Request):
 
 # Route to create or fetch a conversation between two users regarding an item
 @router.post("/start_conversation", response_class=HTMLResponse)
-async def start_conversation(request: Request, item_id: int = Form(...), other_user_id: int = Form(...)):
+async def start_conversation(
+    request: Request,
+    other_user_id: int = Form(...),
+    item_id: int = Form(None)
+):
     user_id = request.cookies.get("user_id")
     if not user_id:
         return HTMLResponse("You must be logged in to start a conversation.", status_code=403)
@@ -216,6 +266,19 @@ async def view_conversation(request: Request, conversation_id: int):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
 
+        # Get conversation info
+        c.execute("SELECT user1_id, user2_id, item_id FROM conversations WHERE id = ?", (conversation_id,))
+        convo = c.fetchone()
+        if not convo or int(user_id) not in convo:
+            return HTMLResponse("Unauthorized", status_code=403)
+
+        # Mark messages as seen for this user
+        c.execute("""
+            UPDATE messages
+            SET seen = 1
+            WHERE conversation_id = ? AND recipient_id = ?
+        """, (conversation_id, user_id))
+
         # Get messages
         c.execute("""
             SELECT m.sender_id, u.username, m.content, m.sent_at
@@ -226,12 +289,6 @@ async def view_conversation(request: Request, conversation_id: int):
         """, (conversation_id,))
         messages = c.fetchall()
 
-        # Get conversation info
-        c.execute("SELECT user1_id, user2_id, item_id FROM conversations WHERE id = ?", (conversation_id,))
-        convo = c.fetchone()
-        if not convo or int(user_id) not in convo:
-            return HTMLResponse("Unauthorized", status_code=403)
-
         user1_id, user2_id, item_id = convo
 
         # Determine the other participant's username
@@ -239,7 +296,7 @@ async def view_conversation(request: Request, conversation_id: int):
         c.execute("SELECT username FROM users WHERE id = ?", (other_id,))
         other_username = c.fetchone()[0]
 
-        # Get item info
+        # Try to get item from items table
         c.execute("""
             SELECT i.name, i.description, u.username
             FROM items i
@@ -248,11 +305,26 @@ async def view_conversation(request: Request, conversation_id: int):
         """, (item_id,))
         item_row = c.fetchone()
 
-        item = {
-            "name": item_row[0],
-            "description": item_row[1],
-            "owner": item_row[2]
-        } if item_row else None
+        # If not found, try requested_items table
+        if item_row:
+            item = {
+                "name": item_row[0],
+                "description": item_row[1],
+                "owner": item_row[2]
+            }
+        else:
+            c.execute("""
+                SELECT r.title, r.description, u.username
+                FROM requested_items r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.id = ?
+            """, (item_id,))
+            request_row = c.fetchone()
+            item = {
+                "name": request_row[0],
+                "description": request_row[1],
+                "owner": request_row[2]
+            } if request_row else None
 
         # Get username for the logged-in user
         c.execute("SELECT username FROM users WHERE id = ?", (user_id,))
@@ -279,8 +351,50 @@ async def send_message(request: Request, conversation_id: int, content: str = Fo
 
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("INSERT INTO messages (conversation_id, sender_id, content) VALUES (?, ?, ?)",
-                  (conversation_id, user_id, content))
+        # Get the recipient from the conversation
+        c.execute("SELECT user1_id, user2_id FROM conversations WHERE id = ?", (conversation_id,))
+        user1_id, user2_id = c.fetchone()
+        recipient_id = user2_id if int(user_id) == user1_id else user1_id
+
+        # Insert message with recipient and unseen status
+        c.execute("""
+            INSERT INTO messages (conversation_id, sender_id, recipient_id, content, seen)
+            VALUES (?, ?, ?, ?, 0)
+        """, (conversation_id, user_id, recipient_id, content))
         conn.commit()
 
     return RedirectResponse(f"/conversations/{conversation_id}", status_code=303)
+
+@router.post("/add_request", response_class=HTMLResponse)
+async def add_request(request: Request, title: str = Form(...), description: str = Form(...)):
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return HTMLResponse("You must be logged in to request items.", status_code=403)
+
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO requested_items (user_id, title, description) VALUES (?, ?, ?)",
+            (user_id, title, description)
+        )
+        conn.commit()
+
+    return RedirectResponse("/", status_code=303)
+
+@router.get("/notifications", response_class=HTMLResponse)
+async def check_notifications(request: Request):
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return HTMLResponse("")
+
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT COUNT(*) FROM messages
+            WHERE recipient_id = ? AND seen = 0
+        """, (user_id,))
+        count = c.fetchone()[0]
+
+    if count > 0:
+        return templates.TemplateResponse("notification_snippet.html", {"request": request})
+    return HTMLResponse("")
