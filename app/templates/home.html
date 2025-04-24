@@ -30,235 +30,18 @@
     </div>
     <div class="page-container">
         <div id="borrow-tab" class="tab-content active">
-            <form id="filter-form" class="filter-form">
-                <input type="text" id="hashtag" name="hashtag" placeholder="Filter by hashtag (e.g. #electronics)"
-                    value="" class="filter-input">
-                <button type="submit" class="filter-button">Filter</button>
-            </form>
-            <h2>Available Items to Borrow</h2>
-            <div class="item-grid">
-                {% if items %}
-                {% for item in items %}
-                <div class="item-card">
-                    <h3>{{ item[1] }}</h3>
-                    <p>{{ item[2] }}</p>
-                    <p>Owner: {{ item[5] }}</p>
-                    <p><strong>Location:</strong> {{ item[8] }}</p>
-                    <form action="/borrow" method="post">
-                        <input type="hidden" name="item_id" value="{{ item[0] }}">
-                        <button type="submit">Borrow</button>
-                    </form>
-                    <form method="post" action="/start_conversation">
-                        <input type="hidden" name="item_id" value="{{ item[0] }}">
-                        <input type="hidden" name="other_user_id" value="{{ item[6] }}">
-                        <button type="submit">Contact</button>
-                    </form>
-                    {% if item[4] %}
-                    <p class="hashtag-list">
-                        {% for tag in item[4].split() %}
-                        <span class="hashtag">#{{ tag.strip('#') }}</span>
-                        {% endfor %}
-                    </p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                {% else %}
-                <p>No items available for borrowing</p>
-                {% endif %}
-            </div>
+            {% include "borrow_tab.html" %}
         </div>
         <div id="requests-tab" class="tab-content">
-            <h2>Requested Items</h2>
-            <div class="item-grid">
-                {% if requested_items %}
-                {% for req in requested_items %}
-                <div class="item-card">
-
-                    <h3>{{ req[1] }}</h3>
-                    <p>{{ req[2] }}</p>
-                    <p>Requester: {{ req[4] }}</p>
-                    <p><strong>Location:</strong> {{ req[6] }}</p>
-                    {% if user_id and req[3] != user_id %}
-
-                    <form method="post" action="/start_conversation">
-                        <input type="hidden" name="item_id" value="{{ req[0] }}">
-                        <input type="hidden" name="other_user_id" value="{{ req[3] }}">
-                        <button type="submit">Contact</button>
-                    </form>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                {% else %}
-                <p>No item requests yet.</p>
-                {% endif %}
-            </div>
+            {% include "requests_tab.html" %}
         </div>
-
         <div id="my-requests-tab" class="tab-content">
-            <div class="form-container">
-                <h2>Request an Item</h2>
-                <form action="/add_request" method="post">
-                    <input type="text" name="title" placeholder="What do you need?" required>
-                    <textarea name="description" placeholder="Describe your request..." required></textarea>
-                    <div>
-                        <label><input type="radio" name="location_mode" value="auto" checked> Use my current
-                            location</label>
-                        <label><input type="radio" name="location_mode" value="manual"> Select location on map</label>
-                    </div>
-                    <div id="manual-location-field-request" style="display: none;">
-                        <label for="request-map">Click on the map to set your location:</label>
-                        <div id="request-map" style="height: 300px;"></div>
-                    </div>
-                    <input type="hidden" id="lat-request" name="latitude">
-                    <input type="hidden" id="lon-request" name="longitude">
-                    <button type="submit">Post Request</button>
-                </form>
-            </div>
-            <h2>My Requests</h2>
-            <div class="item-grid">
-                {% if my_requests %}
-                {% for req in my_requests %}
-                <div class="item-card">
-                    <h3>{{ req[1] }}</h3>
-                    <p>{{ req[2] }}</p>
-                    <p><strong>Location:</strong> {{ req[6] }}</p>
-                </div>
-                {% endfor %}
-                {% else %}
-                <p>You haven’t requested any items yet.</p>
-                {% endif %}
-            </div>
+            {% include "my_requests_tab.html" %}
         </div>
-
         <div id="lend-tab" class="tab-content">
-            <div class="form-container">
-                <h2>Add New Item</h2>
-                <form action="/add_item" method="post">
-                    <div>
-                        <input type="text" name="name" placeholder="Item Name" required>
-                    </div>
-                    <div>
-                        <textarea name="description" placeholder="Description" required></textarea>
-                    </div>
-                    <div>
-                        <input type="text" name="hashtags" placeholder="#electronics #books">
-                    </div>
-                    <div>
-                        <label><input type="radio" name="location_mode" value="auto" checked> Use my current
-                            location</label>
-                        <label><input type="radio" name="location_mode" value="manual"> Enter location manually</label>
-                    </div>
-                    <div id="manual-location-field-item" style="display: none;">
-                        <input type="text" name="manual_location" placeholder="Enter city or address">
-                    </div>
-                    <input type="hidden" id="lat-item" name="latitude">
-                    <input type="hidden" id="lon-item" name="longitude">
-                    <button type="submit">Add Item</button>
-                </form>
-            </div>
-
-            <h2>My Items</h2>
-            <div class="item-grid">
-                {% if my_items %}
-                {% for item in my_items %}
-                <div class="item-card">
-                    <h3>{{ item[1] }}</h3>
-                    <p>{{ item[2] }}</p>
-                    <p>Status: {{ item[3] }}</p>
-                    <p><strong>Location:</strong> {{ item[8] }}</p>
-                    {% if item[4] %}
-                    <p>
-                        {% for tag in item[4].split() %}
-                        <span class="hashtag">#{{ tag.strip('#') }}</span>
-                        {% endfor %}
-                    </p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                {% endif %}
-            </div>
+            {% include "lend_tab.html" %}
         </div>
     </div>
-
-    <script>
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            const selectedTab = document.getElementById(`${tabName}-tab`);
-            selectedTab.classList.add('active');
-
-            if (tabName === 'my-requests') {
-                if (!window.requestMap) {
-                    // Leaflet map setup when switching to tab
-                    window.requestMap = L.map('request-map').setView([46.8, 8.2], 8);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(window.requestMap);
-
-                    let requestMarker;
-
-                    window.requestMap.on('click', function (e) {
-                        const { lat, lng } = e.latlng;
-
-                        if (requestMarker) window.requestMap.removeLayer(requestMarker);
-                        requestMarker = L.marker([lat, lng]).addTo(window.requestMap);
-
-                        document.getElementById('lat-request').value = lat;
-                        document.getElementById('lon-request').value = lng;
-                    });
-
-                    if (document.querySelector('input[name="location_mode"]:checked').value === 'auto') {
-                        navigator.geolocation.getCurrentPosition(function (pos) {
-                            const { latitude, longitude } = pos.coords;
-                            requestMarker = L.marker([latitude, longitude]).addTo(window.requestMap);
-                            document.getElementById('lat-request').value = latitude;
-                            document.getElementById('lon-request').value = longitude;
-                            window.requestMap.setView([latitude, longitude], 12);
-                        }, function (err) {
-                            console.error("Geolocation error:", err);
-                        });
-                    }
-                } else {
-                    setTimeout(() => {
-                        window.requestMap.invalidateSize();
-                    }, 100);
-                }
-            }
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            const filterForm = document.getElementById('filter-form');
-            const hashtagInput = document.getElementById('hashtag');
-            const items = document.querySelectorAll('.item-card');
-
-            function filterItems() {
-                const filter = hashtagInput.value.trim().toLowerCase().replace(/^#/, '');
-
-                items.forEach(item => {
-                    const hashtags = Array.from(item.querySelectorAll('.hashtag'))
-                        .map(tag => tag.textContent.toLowerCase().replace(/^#/, ''));
-
-                    if (filter === '' || hashtags.includes(filter)) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-
-            // Prevent form submission
-            filterForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                filterItems();
-            });
-
-        });
-    </script>
 
     {% else %}
     <div class="form-container">
@@ -269,100 +52,25 @@
         </form>
     </div>
     {% endif %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            function setupLocationToggle(radioName, manualId, latId, lonId) {
-                const radios = document.querySelectorAll(`input[name="${radioName}"]`);
-                const manualField = document.getElementById(manualId);
 
-                radios.forEach(radio => {
-                    radio.addEventListener('change', function () {
-                        if (this.value === 'manual') {
-                            manualField.style.display = 'block';
-                        } else {
-                            manualField.style.display = 'none';
-                        }
-                    });
-                });
+    <script type="module">
+        import { initRequestMap, initItemMap } from "/static/js/map.js";
+        import { setupLocationToggle } from "/static/js/locationToggle.js";
 
-                navigator.geolocation.getCurrentPosition(
-                    function (pos) {
-                        document.getElementById(latId).value = pos.coords.latitude;
-                        document.getElementById(lonId).value = pos.coords.longitude;
-                    },
-                    function (err) {
-                        console.error("Geolocation error:", err);
-                    }
-                );
-            }
-
+        document.addEventListener('DOMContentLoaded', () => {
             setupLocationToggle("location_mode", "manual-location-field-item", "lat-item", "lon-item");
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Location mode toggle for request map
-            const radios = document.querySelectorAll('input[name="location_mode"]');
-            const mapField = document.getElementById('manual-location-field-request');
+            setupLocationToggle("location_mode", "manual-location-field-request", "lat-request", "lon-request");
 
-            let requestMapInitialized = false;
-            function initRequestMap() {
-                if (requestMapInitialized) return;
-                requestMapInitialized = true;
-                window.requestMap = L.map('request-map').setView([46.8, 8.2], 8);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(window.requestMap);
-                let requestMarker;
-                window.requestMap.on('click', function (e) {
-                    const { lat, lng } = e.latlng;
-                    if (requestMarker) window.requestMap.removeLayer(requestMarker);
-                    requestMarker = L.marker([lat, lng]).addTo(window.requestMap);
-                    document.getElementById('lat-request').value = lat;
-                    document.getElementById('lon-request').value = lng;
-                });
-                if (document.querySelector('input[name="location_mode"]:checked').value === 'auto') {
-                    navigator.geolocation.getCurrentPosition(function (pos) {
-                        const { latitude, longitude } = pos.coords;
-                        requestMarker = L.marker([latitude, longitude]).addTo(window.requestMap);
-                        document.getElementById('lat-request').value = latitude;
-                        document.getElementById('lon-request').value = longitude;
-                        window.requestMap.setView([latitude, longitude], 12);
-                    }, function (err) {
-                        console.error("Geolocation error:", err);
-                    });
-                }
+            if (document.getElementById("manual-location-field-request")) {
+                initRequestMap();
             }
-
-            // Initialize map instance early so it's ready when shown
-            initRequestMap();
-
-            // Radio toggling logic for manual/auto location (request form)
-            radios.forEach(radio => {
-                radio.addEventListener('change', function () {
-                    if (this.value === 'manual') {
-                        mapField.style.display = 'block';
-                        initRequestMap();
-                        setTimeout(() => window.requestMap.invalidateSize(), 100);
-                    } else {
-                        mapField.style.display = 'none';
-                    }
-                });
-            });
-
-            // Existing tab click logic (keep after radio logic)
-            document.querySelectorAll('.tab').forEach(button => {
-                button.addEventListener('click', function () {
-                    if (this.textContent.includes("My Requests")) {
-                        setTimeout(() => {
-                            initRequestMap();
-                            window.requestMap.invalidateSize();
-                        }, 100);
-                    }
-                });
-            });
+            if (document.getElementById("manual-location-field-item")) {
+                initItemMap();
+            }
         });
     </script>
+
+    <script src="/static/js/tabs.js"></script>
 </body>
 
 </html>

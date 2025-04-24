@@ -1,0 +1,22 @@
+<h2>Requested Items</h2>
+<div class="item-grid">
+    {% if requested_items %}
+    {% for req in requested_items %}
+    <div class="item-card">
+        <h3>{{ req[1] }}</h3>
+        <p>{{ req[2] }}</p>
+        <p><strong>Requester:</strong> {{ req[4] }}</p>
+        <p><strong>Location:</strong> {{ req[6] }}</p>
+        {% if user_id and req[3]|int != user_id|int %}
+        <form method="post" action="/start_conversation">
+            <input type="hidden" name="item_id" value="">
+            <input type="hidden" name="other_user_id" value="{{ item[6] }}">
+            <button type="submit">Contact</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No requested items at the moment.</p>
+    {% endif %}
+</div>

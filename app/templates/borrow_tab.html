@@ -1,0 +1,22 @@
+<div class="item-grid">
+    {% if items %}
+    {% for item in items %}
+    <div class="item-card">
+        <h3>{{ item[1] }}</h3>
+        <p>{{ item[2] }}</p>
+        <p><strong>Owner:</strong> {{ item[5] }}</p>
+        <p><strong>Hashtags:</strong> {{ item[4] }}</p>
+        <p><strong>Location:</strong> {{ item[8] }}</p>
+        {% if user_id and item[3]|int != user_id|int %}
+        <form method="post" action="/start_conversation">
+            <input type="hidden" name="item_id" value="{{ item[0] }}">
+            <input type="hidden" name="other_user_id" value="{{ item[6] }}">
+            <button type="submit">Contact</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No items available to borrow at the moment.</p>
+    {% endif %}
+</div>
