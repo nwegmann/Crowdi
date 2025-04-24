@@ -145,7 +145,6 @@ form {
 .tabs {
     display: flex;
     justify-content: flex-end;
-    /* align to the right */
     gap: 10px;
     margin: 20px 0;
 }
@@ -167,6 +166,7 @@ form {
 }
 
 .tab.active {
+    background-color: var(--dar_purple);
     color: white;
     font-weight: bold;
 }

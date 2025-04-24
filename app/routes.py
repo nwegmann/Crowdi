@@ -86,7 +86,7 @@ async def home(request: Request):
 
             # Get requested items
             c.execute("""
-                SELECT r.id, r.title, r.description, r.user_id, u.username
+                SELECT r.id, r.title, r.description, r.user_id, u.username, r.location_name, r.latitude, r.longitude
                 FROM requested_items r
                 JOIN users u ON r.user_id = u.id
             """)
@@ -114,20 +114,33 @@ async def home(request: Request):
 
 @router.post("/add_item", response_class=HTMLResponse)
 async def add_item(
-    request: Request, 
-    name: str = Form(...), 
+    request: Request,
+    name: str = Form(...),
     description: str = Form(...),
-    hashtags: str = Form(...)
+    hashtags: str = Form(...),
+    location_mode: str = Form(...),
+    manual_location: str = Form(None),
+    latitude: str = Form(None),
+    longitude: str = Form(None)
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
         return HTMLResponse("You must be logged in to add items.", status_code=403)
 
+    if location_mode == "manual":
+        location_name = manual_location
+        latitude_val = None
+        longitude_val = None
+    else:
+        location_name = "GPS Location"
+        latitude_val = float(latitude) if latitude else None
+        longitude_val = float(longitude) if longitude else None
+
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute(
-            "INSERT INTO items (owner_id, name, description, hashtags) VALUES (?, ?, ?, ?)",
-            (user_id, name, description, hashtags)
+            "INSERT INTO items (owner_id, name, description, hashtags, location_name, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (user_id, name, description, hashtags, location_name, latitude_val, longitude_val)
         )
         conn.commit()
 
@@ -366,16 +379,33 @@ async def send_message(request: Request, conversation_id: int, content: str = Fo
     return RedirectResponse(f"/conversations/{conversation_id}", status_code=303)
 
 @router.post("/add_request", response_class=HTMLResponse)
-async def add_request(request: Request, title: str = Form(...), description: str = Form(...)):
+async def add_request(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    location_mode: str = Form(...),
+    manual_location: str = Form(None),
+    latitude: str = Form(None),
+    longitude: str = Form(None)
+):
     user_id = request.cookies.get("user_id")
     if not user_id:
         return HTMLResponse("You must be logged in to request items.", status_code=403)
 
+    if location_mode == "manual":
+        location_name = manual_location
+        latitude_val = None
+        longitude_val = None
+    else:
+        location_name = "GPS Location"
+        latitude_val = float(latitude) if latitude else None
+        longitude_val = float(longitude) if longitude else None
+
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute(
-            "INSERT INTO requested_items (user_id, title, description) VALUES (?, ?, ?)",
-            (user_id, title, description)
+            "INSERT INTO requested_items (user_id, title, description, location_name, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, title, description, location_name, latitude_val, longitude_val)
         )
         conn.commit()
 
