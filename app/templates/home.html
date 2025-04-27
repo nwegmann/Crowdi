@@ -53,23 +53,6 @@
     </div>
     {% endif %}
 
-    <script type="module">
-        import { initRequestMap, initItemMap } from "/static/js/map.js";
-        import { setupLocationToggle } from "/static/js/locationToggle.js";
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setupLocationToggle("location_mode", "manual-location-field-item", "lat-item", "lon-item");
-            setupLocationToggle("location_mode", "manual-location-field-request", "lat-request", "lon-request");
-
-            if (document.getElementById("manual-location-field-request")) {
-                initRequestMap();
-            }
-            if (document.getElementById("manual-location-field-item")) {
-                initItemMap();
-            }
-        });
-    </script>
-
     <script src="/static/js/tabs.js"></script>
 </body>
 

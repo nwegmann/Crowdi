@@ -4,16 +4,6 @@
         <input type="text" name="name" placeholder="Item name" required>
         <textarea name="description" placeholder="Describe the item..." required></textarea>
         <input type="text" name="hashtags" placeholder="Hashtags (comma separated)">
-        <div>
-            <label><input type="radio" name="location_mode" value="auto" checked> Use my current location</label>
-            <label><input type="radio" name="location_mode" value="manual"> Select location on map</label>
-        </div>
-        <div id="manual-location-field-item" style="display: none;">
-            <label for="item-map">Click on the map to set item location:</label>
-            <div id="item-map" style="height: 300px;"></div>
-        </div>
-        <input type="hidden" id="lat-item" name="latitude">
-        <input type="hidden" id="lon-item" name="longitude">
         <button type="submit">Add Item</button>
     </form>
 </div>
@@ -25,7 +15,6 @@
         <h3>{{ item[1] }}</h3>
         <p>{{ item[2] }}</p>
         <p><strong>Hashtags:</strong> {{ item[4] }}</p>
-        <p><strong>Location:</strong> {{ item[8] }}</p>
     </div>
     {% endfor %}
     {% else %}

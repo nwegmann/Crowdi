@@ -49,23 +49,7 @@
         </div>
     </header>
     {% block content %}{% endblock %}
-    <form id="location-form" style="display: none;">
-        <input type="hidden" id="user-lat" name="latitude">
-        <input type="hidden" id="user-lon" name="longitude">
-    </form>
 
-    <script>
-        navigator.geolocation.getCurrentPosition(
-            function (position) {
-                document.getElementById("user-lat").value = position.coords.latitude;
-                document.getElementById("user-lon").value = position.coords.longitude;
-                console.log("Location captured:", position.coords.latitude, position.coords.longitude);
-            },
-            function (error) {
-                console.error("Geolocation error:", error.message);
-            }
-        );
-    </script>
 </body>
 
 </html>

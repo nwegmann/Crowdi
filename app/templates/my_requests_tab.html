@@ -3,16 +3,6 @@
     <form action="/add_request" method="post">
         <input type="text" name="title" placeholder="What do you need?" required>
         <textarea name="description" placeholder="Describe your request..." required></textarea>
-        <div>
-            <label><input type="radio" name="location_mode" value="auto" checked> Use my current location</label>
-            <label><input type="radio" name="location_mode" value="manual"> Select location on map</label>
-        </div>
-        <div id="manual-location-field-request" style="display: none;">
-            <label for="request-map">Click on the map to set your location:</label>
-            <div id="request-map" style="height: 300px;"></div>
-        </div>
-        <input type="hidden" id="lat-request" name="latitude">
-        <input type="hidden" id="lon-request" name="longitude">
         <button type="submit">Post Request</button>
     </form>
 </div>
@@ -23,7 +13,6 @@
     <div class="item-card">
         <h3>{{ req[1] }}</h3>
         <p>{{ req[2] }}</p>
-        <p><strong>Location:</strong> {{ req[6] }}</p>
     </div>
     {% endfor %}
     {% else %}

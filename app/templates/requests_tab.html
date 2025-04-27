@@ -9,8 +9,8 @@
         <p><strong>Location:</strong> {{ req[6] }}</p>
         {% if user_id and req[3]|int != user_id|int %}
         <form method="post" action="/start_conversation">
-            <input type="hidden" name="item_id" value="">
-            <input type="hidden" name="other_user_id" value="{{ item[6] }}">
+            <input type="hidden" name="item_id" value="{{ req[0] }}">
+            <input type="hidden" name="other_user_id" value="{{ req[3] }}">
             <button type="submit">Contact</button>
         </form>
         {% endif %}

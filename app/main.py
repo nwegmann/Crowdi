@@ -1,10 +1,8 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.routes import router as route_handlers
+from app.routes import routers  # Import the routes from the new modularized files
 import app.db as db
-import sqlite3
 import os
 
 app = FastAPI()
@@ -15,12 +13,19 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
+# Initialize database
 DB_PATH = db.get_path()
 db.init_db()
 
+# Mount static files for front-end assets
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+# Initialize Jinja templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
-app.include_router(route_handlers)
+
+# Include the modularized route handlers
+for router in routers:
+    app.include_router(router)
 
 # Create template file if not exists
 home_html_path = os.path.join(TEMPLATES_DIR, "home.html")

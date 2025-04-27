@@ -6,7 +6,6 @@
         <p>{{ item[2] }}</p>
         <p><strong>Owner:</strong> {{ item[5] }}</p>
         <p><strong>Hashtags:</strong> {{ item[4] }}</p>
-        <p><strong>Location:</strong> {{ item[8] }}</p>
         {% if user_id and item[3]|int != user_id|int %}
         <form method="post" action="/start_conversation">
             <input type="hidden" name="item_id" value="{{ item[0] }}">
