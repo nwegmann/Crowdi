@@ -17,12 +17,22 @@ async def home(request: Request):
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        c.execute("""
-            SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.owner_id
-            FROM items i
-            JOIN users u ON i.owner_id = u.id
-            WHERE i.owner_id != ?
-        """, (user_id_int if user_id_int else -1,))
+        search_query = request.query_params.get("search", "")
+        if search_query:
+            c.execute("""
+                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.owner_id
+                FROM items i
+                JOIN users u ON i.owner_id = u.id
+                WHERE (i.owner_id != ?)
+                AND (i.name LIKE ? OR i.description LIKE ? OR i.hashtags LIKE ?)
+            """, (user_id_int if user_id_int else -1, f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"))
+        else:
+            c.execute("""
+                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.owner_id
+                FROM items i
+                JOIN users u ON i.owner_id = u.id
+                WHERE i.owner_id != ?
+            """, (user_id_int if user_id_int else -1,))
         items = c.fetchall()
 
         c.execute("""

@@ -5,7 +5,13 @@
         <h3>{{ item.name }}</h3>
         <p>{{ item.description }}</p>
         <p><strong>Owner:</strong> {{ item.username }}</p>
-        <p><strong>Hashtags:</strong> {{ item.hashtags }}</p>
+        {% if item.hashtags %}
+        <div class="hashtags">
+            {% for tag in item.hashtags.split(",") %}
+            <span class="hashtag-bubble">{{ tag.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% if user_id and item.owner_id|int != user_id|int %}
         <form method="post" action="/start_conversation">
             <input type="hidden" name="item_id" value="{{ item.id }}">

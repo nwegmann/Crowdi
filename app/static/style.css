@@ -125,16 +125,24 @@ form {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+.item-card button {
+    background-color: var(--flame);
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    transition: background-color 0.2s ease;
+    display: block;
+    margin: 20px auto 0;
+}
+
 .item-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-    padding: 20px;
-}
-
-.form-container {
-    max-width: 500px;
-    margin: 20px auto;
     padding: 20px;
 }
 
@@ -252,11 +260,6 @@ form {
     font-family: 'Roboto', sans-serif;
 }
 
-.form-container textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
 .form-container button {
     background-color: var(--flame);
     color: white;
@@ -273,16 +276,6 @@ form {
 
 .hidden {
     display: none;
-}
-
-.hashtag {
-    display: inline-block;
-    background-color: var(--flame);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-right: 4px;
-    font-size: 0.8rem;
 }
 
 /* Conversation List */
@@ -497,10 +490,51 @@ form {
 
 .hashtag-bubble {
     display: inline-block;
-    background-color: var(--flame);
+    background-color: var(--sunset);
     color: var(--isabelline);
     padding: 5px 10px;
     border-radius: 20px;
     margin: 2px;
     font-size: 0.9em;
+}
+
+/* Home Page Filter Styles */
+.filter-container {
+    margin: 20px auto;
+    text-align: center;
+}
+
+.filter-container form {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-container input[type="text"] {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--isabelline);
+    border-radius: 6px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.filter-container input[type="text"]:focus {
+    border-color: var(--dar_purple);
+    outline: none;
+}
+
+.filter-container button {
+    padding: 8px 16px;
+    background-color: var(--flame);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    transition: background-color 0.2s ease;
+}
+
+.filter-container button:hover {
+    background-color: var(--dar_purple);
 }

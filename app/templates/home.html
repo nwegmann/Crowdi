@@ -20,6 +20,17 @@
 <body>
 
     {% if user_id %}
+    <div id="borrow-tab" class="requests-tab">
+        <div class="filter-container">
+            <form action="/" method="get">
+                <input type="text" name="search" placeholder="Search items...">
+                <button type="submit">Filter</button>
+                <button type="button" id="reset-filter">Reset</button>
+            </form>
+        </div>
+        <!-- Borrow items content here -->
+    </div>
+
     <div class="tabs-section">
         <div class="tabs">
             <button class="tab active" onclick="switchTab('borrow')">Borrow Items</button>
