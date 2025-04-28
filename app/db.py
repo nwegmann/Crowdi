@@ -78,6 +78,7 @@ def init_db():
                 user_id INTEGER NOT NULL,
                 title TEXT NOT NULL,
                 description TEXT,
+                hashtags TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )

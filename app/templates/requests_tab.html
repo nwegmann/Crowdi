@@ -5,6 +5,7 @@
     <div class="item-card">
         <h3>{{ req.title }}</h3>
         <p>{{ req.description }}</p>
+        <p><strong>Hashtags:</strong> {{ req.hashtags }}</p>
         <p><strong>Requester:</strong> {{ req.username }}</p>
         {% if user_id and req.user_id|int != user_id|int %}
         <form method="post" action="/start_conversation">

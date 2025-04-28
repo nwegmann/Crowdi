@@ -26,7 +26,7 @@ async def home(request: Request):
         items = c.fetchall()
 
         c.execute("""
-            SELECT r.id, r.title, r.description, r.user_id, u.username
+            SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username
             FROM requested_items r
             JOIN users u ON r.user_id = u.id
             WHERE r.user_id != ?
@@ -37,7 +37,7 @@ async def home(request: Request):
         my_items = []
         if user_id_int:
             c.execute("""
-                SELECT r.id, r.title, r.description, r.user_id, u.username
+                SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username
                 FROM requested_items r
                 JOIN users u ON r.user_id = u.id
                 WHERE r.user_id = ?

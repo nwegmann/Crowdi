@@ -57,14 +57,14 @@ async def home(request: Request):
             my_items = c.fetchall()
 
             c.execute("""
-                SELECT r.id, r.title, r.description, r.user_id, u.username, r.location_name, r.latitude, r.longitude
+                SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username, r.location_name, r.latitude, r.longitude
                 FROM requested_items r
                 JOIN users u ON r.user_id = u.id
             """)
             requested_items = c.fetchall()
 
             c.execute("""
-                SELECT id, title, description
+                SELECT id, title, description, hashtags
                 FROM requested_items
                 WHERE user_id = ?
             """, (user_id,))

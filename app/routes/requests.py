@@ -12,6 +12,7 @@ async def add_request(
     request: Request,
     title: str = Form(...),
     description: str = Form(...),
+    hashtags: str = Form(None),
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
@@ -21,9 +22,9 @@ async def add_request(
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            INSERT INTO requested_items (title, description, user_id)
-            VALUES (?, ?, ?)
-        """, (title, description, user_id))
+            INSERT INTO requested_items (title, description, hashtags, user_id)
+            VALUES (?, ?, ?, ?)
+        """, (title, description, hashtags, user_id))
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)
@@ -38,7 +39,7 @@ async def my_requests(request: Request):
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            SELECT r.id, r.title, r.description, r.user_id, u.username
+            SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username
             FROM requested_items r
             JOIN users u ON r.user_id = u.id
             WHERE r.user_id = ?
@@ -60,7 +61,7 @@ async def requests(request: Request):
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            SELECT r.id, r.title, r.description, r.user_id, u.username
+            SELECT r.id, r.title,r. description, r.hashtags, r.user_id, u.username
             FROM requested_items r
             JOIN users u ON r.user_id = u.id
             WHERE r.user_id != ?

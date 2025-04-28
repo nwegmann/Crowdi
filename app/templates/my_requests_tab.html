@@ -3,6 +3,7 @@
     <form action="/add_request" method="post">
         <input type="text" name="title" placeholder="What do you need?" required>
         <textarea name="description" placeholder="Describe your request..." required></textarea>
+        <input type="text" name="hashtags" placeholder="Hashtags (comma-separated)">
         <button type="submit">Post Request</button>
     </form>
 </div>
@@ -13,6 +14,7 @@
     <div class="item-card">
         <h3>{{ req.title }}</h3>
         <p>{{ req.description }}</p>
+        <p><strong>Hashtags:</strong> {{ req.hashtags }}</p>
     </div>
     {% endfor %}
     {% else %}
