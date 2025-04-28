@@ -29,12 +29,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Make all tab buttons listen for clicks
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function (e) {
             e.preventDefault();
             const tabName = this.getAttribute('data-tab');
-            switchTab(tabName);
+
+            // Save to localStorage immediately
+            localStorage.setItem('activeTab', tabName);
+
+            const url = new URL(window.location.origin);
+            url.pathname = "/";
+            url.searchParams.set('tab', tabName);
+
+            // Remove any existing search terms
+            url.searchParams.delete('search');
+
+            window.location.href = url.toString();  // Force full reload
         });
     });
 
