@@ -494,3 +494,13 @@ form {
     cursor: pointer;
     padding: 0;
 }
+
+.hashtag-bubble {
+    display: inline-block;
+    background-color: var(--flame);
+    color: var(--isabelline);
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin: 2px;
+    font-size: 0.9em;
+}

@@ -14,7 +14,13 @@
     <div class="item-card">
         <h3>{{ item.name }}</h3>
         <p>{{ item.description }}</p>
-        <p><strong>Hashtags:</strong> {{ item.hashtags }}</p>
+        {% if item.hashtags %}
+        <div class="hashtags">
+            {% for tag in item.hashtags.split(",") %}
+            <span class="hashtag-bubble">{{ tag.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
     {% else %}
