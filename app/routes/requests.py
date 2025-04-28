@@ -18,6 +18,7 @@ async def add_request(
         return RedirectResponse(url="/", status_code=303)
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
             INSERT INTO requested_items (title, description, user_id)
@@ -34,6 +35,7 @@ async def my_requests(request: Request):
         return RedirectResponse(url="/", status_code=303)
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
             SELECT r.id, r.title, r.description, r.user_id, u.username
@@ -55,9 +57,10 @@ async def requests(request: Request):
         return RedirectResponse(url="/", status_code=303)
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            SELECT r.id, r.title, r.description, r.user_id, u.username,
+            SELECT r.id, r.title, r.description, r.user_id, u.username
             FROM requested_items r
             JOIN users u ON r.user_id = u.id
             WHERE r.user_id != ?

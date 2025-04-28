@@ -13,10 +13,11 @@ async def conversations(request: Request):
     if not user_id:
         return RedirectResponse(url="/", status_code=303)
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("SELECT username FROM users WHERE id = ?", (user_id,))
         row = c.fetchone()
-        username = row[0] if row else None
+        username = row["username"] if row else None
         c.execute("""
             SELECT c.id, u.username, i.name,
                 EXISTS(
@@ -51,6 +52,7 @@ async def view_conversation(request: Request, conversation_id: int):
         return HTMLResponse("You must be logged in to view messages.", status_code=403)
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
         c.execute("""
@@ -74,10 +76,12 @@ async def view_conversation(request: Request, conversation_id: int):
         """, (conversation_id, user_id))
         conn.commit()
 
-        user1_id, user2_id, item_id = convo
+        user1_id = convo["user1_id"]
+        user2_id = convo["user2_id"]
+        item_id = convo["item_id"]
         other_id = user1_id if int(user_id) != user1_id else user2_id
         c.execute("SELECT username FROM users WHERE id = ?", (other_id,))
-        other_username = c.fetchone()[0]
+        other_username = c.fetchone()["username"]
 
         c.execute("""
             SELECT i.name, i.description, u.username
@@ -88,14 +92,14 @@ async def view_conversation(request: Request, conversation_id: int):
         item_row = c.fetchone()
 
         item = {
-            "name": item_row[0],
-            "description": item_row[1],
-            "owner": item_row[2],
+            "name": item_row["name"],
+            "description": item_row["description"],
+            "owner": item_row["username"],
         } if item_row else None
 
         c.execute("SELECT username FROM users WHERE id = ?", (user_id,))
         row = c.fetchone()
-        username = row[0] if row else None
+        username = row["username"] if row else None
 
     return templates.TemplateResponse("conversation.html", {
         "request": request,
@@ -140,6 +144,7 @@ async def start_conversation(
     user_id = int(user_id)
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         # Check if conversation already exists
         c.execute('''
@@ -150,7 +155,7 @@ async def start_conversation(
         existing = c.fetchone()
 
         if existing:
-            conversation_id = existing[0]
+            conversation_id = existing["id"]
         else:
             c.execute('''
                 INSERT INTO conversations (user1_id, user2_id, item_id) 

@@ -6,13 +6,13 @@
 
     {% if conversations %}
     {% for convo in conversations %}
-    <a href="/conversations/{{ convo[0]}}" class="conversation-link conversation-card">
-        {% if convo[3] %}
+    <a href="/conversations/{{ convo.id }}" class="conversation-link conversation-card">
+        {% if convo.has_unread %}
         <span class="notification-dot"></span>
         {% endif %}
-        <strong>Chat with {{convo[1]}}</strong><br>
-        {% if convo[2] %}
-        <small>Item: {{ convo[2] }}</small><br>
+        <strong>Chat with {{ convo.username }}</strong><br>
+        {% if convo.item_name %}
+        <small>Item: {{ convo.item_name }}</small><br>
         {% endif %}
         {# <small>Started {{ convo.created_at }}</small> #}
     </a>

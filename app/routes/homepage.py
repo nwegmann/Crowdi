@@ -14,6 +14,7 @@ async def home(request: Request):
     username = None
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
         c.execute("""
@@ -54,7 +55,7 @@ async def home(request: Request):
             c.execute("SELECT username FROM users WHERE id = ?", (user_id_int,))
             row = c.fetchone()
             if row:
-                username = row[0]
+                username = row["username"]
 
     return templates.TemplateResponse("home.html", {
         "request": request,

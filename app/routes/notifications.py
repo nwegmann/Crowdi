@@ -15,6 +15,7 @@ async def check_notifications(request: Request):
         return HTMLResponse("")
 
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
             SELECT COUNT(*)

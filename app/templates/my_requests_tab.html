@@ -11,8 +11,8 @@
     {% if my_requests %}
     {% for req in my_requests %}
     <div class="item-card">
-        <h3>{{ req[1] }}</h3>
-        <p>{{ req[2] }}</p>
+        <h3>{{ req.title }}</h3>
+        <p>{{ req.description }}</p>
     </div>
     {% endfor %}
     {% else %}

@@ -14,10 +14,10 @@
         <h2 style="flex: 0 0 auto;">Chat with {{ other_username }}</h2>
 
         <div id="message-list" style="flex: 1 1 auto; overflow-y: auto; margin-bottom: 20px;">
-            {% for sender_id, username, content, sent_at in messages %}
-            <div class="message {% if sender_id == user_id %}sent{% else %}received{% endif %}">
-                <strong>{{ username }}:</strong> {{ content }}<br>
-                <small>{{ sent_at }}</small>
+            {% for msg in messages %}
+            <div class="message {% if msg.sender_id == user_id %}sent{% else %}received{% endif %}">
+                <strong>{{ msg.username }}:</strong> {{ msg.content }}<br>
+                <small>{{ msg.sent_at }}</small>
             </div>
             {% endfor %}
         </div>

@@ -2,14 +2,14 @@
     {% if items %}
     {% for item in items %}
     <div class="item-card">
-        <h3>{{ item[1] }}</h3>
-        <p>{{ item[2] }}</p>
-        <p><strong>Owner:</strong> {{ item[5] }}</p>
-        <p><strong>Hashtags:</strong> {{ item[4] }}</p>
-        {% if user_id and item[3]|int != user_id|int %}
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.description }}</p>
+        <p><strong>Owner:</strong> {{ item.username }}</p>
+        <p><strong>Hashtags:</strong> {{ item.hashtags }}</p>
+        {% if user_id and item.owner_id|int != user_id|int %}
         <form method="post" action="/start_conversation">
-            <input type="hidden" name="item_id" value="{{ item[0] }}">
-            <input type="hidden" name="other_user_id" value="{{ item[6] }}">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="other_user_id" value="{{ item.owner_id }}">
             <button type="submit">Contact</button>
         </form>
         {% endif %}
