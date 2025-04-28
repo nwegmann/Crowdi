@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    document.querySelectorAll('.tab').forEach(tab => {
+    document.querySelectorAll('.tab[data-tab]').forEach(tab => {
         tab.addEventListener('click', function (e) {
             e.preventDefault();
             const tabName = this.getAttribute('data-tab');
