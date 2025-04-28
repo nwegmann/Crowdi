@@ -1,71 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Crowdi - Item Lending Platform</title>
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.2"></script>
-    <link rel="stylesheet" href="/static/style.css?v=1">
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=1">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-sA+e2H8gCk4A8X5Q+v4n5w1E9I9L9Lqz3p+MZf+v+HnM=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-o9N1j7Q6fW3bqA6xQp8h2K1xV5kY4u5O5f4f5v5g5cI=" crossorigin=""></script>
-</head>
-
-<body>
-
-    {% if user_id %}
-    <div id="borrow-tab" class="requests-tab">
-        <div class="filter-container">
-            <form action="/" method="get">
-                <input type="text" name="search" placeholder="Search items...">
-                <button type="submit">Filter</button>
-                <button type="button" id="reset-filter">Reset</button>
-            </form>
-        </div>
-        <!-- Borrow items content here -->
+{% if user_id %}
+<div class="tabs-section">
+    <div class="tabs">
+        <button class="tab active" data-tab="borrow">Borrow Items</button>
+        <button class="tab" data-tab="requests">Requested Items</button>
+        <button class="tab" data-tab="my-requests">My Requests</button>
+        <button class="tab" data-tab="lend">My Lending</button>
     </div>
-
-    <div class="tabs-section">
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('borrow')">Borrow Items</button>
-            <button class="tab" onclick="switchTab('requests')">Requested Items</button>
-            <button class="tab" onclick="switchTab('my-requests')">My Requests</button>
-            <button class="tab" onclick="switchTab('lend')">My Lending</button>
-        </div>
+</div>
+<div class="page-container">
+    <div id="borrow-tab" class="tab-content active">
+        {% include "borrow_tab.html" %}
     </div>
-    <div class="page-container">
-        <div id="borrow-tab" class="tab-content active">
-            {% include "borrow_tab.html" %}
-        </div>
-        <div id="requests-tab" class="tab-content">
-            {% include "requests_tab.html" %}
-        </div>
-        <div id="my-requests-tab" class="tab-content">
-            {% include "my_requests_tab.html" %}
-        </div>
-        <div id="lend-tab" class="tab-content">
-            {% include "lend_tab.html" %}
-        </div>
+    <div id="requests-tab" class="tab-content">
+        {% include "requests_tab.html" %}
     </div>
-
-    {% else %}
-    <div class="form-container">
-        <h2>Login</h2>
-        <form action="/login" method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <button type="submit">Login</button>
-        </form>
+    <div id="my-requests-tab" class="tab-content">
+        {% include "my_requests_tab.html" %}
     </div>
-    {% endif %}
+    <div id="lend-tab" class="tab-content">
+        {% include "lend_tab.html" %}
+    </div>
+</div>
 
-    <script src="/static/js/tabs.js"></script>
-</body>
+{% else %}
+<div class="form-container">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <button type="submit">Login</button>
+    </form>
+</div>
+{% endif %}
 
-</html>
+<script src="/static/js/tabs.js"></script>
 {% endblock %}
