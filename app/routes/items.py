@@ -41,3 +41,19 @@ async def borrow_item(request: Request, item_id: int = Form(...)):
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)
+
+@router.post("/delete_item")
+async def delete_item(request: Request, item_id: int = Form(...)):
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return RedirectResponse(url="/", status_code=303)
+
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        # Make sure only the item's owner can delete it
+        c.execute("DELETE FROM items WHERE id = ? AND owner_id = ?", (item_id, user_id))
+        conn.commit()
+
+    return RedirectResponse(url="/", status_code=303)
+
