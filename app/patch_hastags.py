@@ -12,3 +12,4 @@ with sqlite3.connect(DB_PATH) as conn:
         print("Column added.")
     else:
         print("Column 'hashtags' already exists.")
+ 

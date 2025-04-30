@@ -29,6 +29,28 @@ async def add_request(
 
     return RedirectResponse(url="/", status_code=303)
 
+@router.post("/delete_request")
+async def delete_request(request: Request, request_id: int = Form(...)):
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return RedirectResponse(url="/", status_code=303)
+    
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        # Check if the request belongs to the logged-in user
+        c.execute("SELECT user_id FROM requested_items WHERE id = ?", (request_id,))
+        row = c.fetchone()
+        
+        if row and row['user_id'] == int(user_id):
+            # Delete the request from the database
+            c.execute("DELETE FROM requested_items WHERE id = ?", (request_id,))
+            conn.commit()
+    
+    return RedirectResponse(url="/", status_code=303)
+
+
 @router.get("/my_requests", response_class=HTMLResponse)
 async def my_requests(request: Request):
     user_id = request.cookies.get("user_id")
