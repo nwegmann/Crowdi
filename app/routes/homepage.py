@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 import sqlite3
 from app.db import DB_PATH
 from app.data.cities import CITIES
+import math
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -16,12 +17,24 @@ async def home(request: Request):
     requested_items = []
     items = []
 
+    search_query = request.query_params.get("search", "")
+    tab = request.query_params.get("tab", "borrow") 
+    origin_city = request.query_params.get("origin_city")
+    radius_km   = float(request.query_params.get("radius", 0) or 0)
+    origin_coords = CITIES.get(origin_city) if origin_city else None
+
+    def haversine(lat1, lon1, lat2, lon2):
+        R = 6371.0  # km
+        phi1, phi2 = math.radians(lat1), math.radians(lon1)
+        dphi = math.radians(lat2 - lat1)
+        dlambda = math.radians(lon2 - lon1)
+        a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+        return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        search_query = request.query_params.get("search", "")
-        tab = request.query_params.get("tab", "borrow") 
         if tab == "borrow":
             if search_query:
                 c.execute("""
@@ -39,6 +52,13 @@ async def home(request: Request):
                     WHERE i.owner_id != ?
                 """, (user_id_int if user_id_int else -1,))
             items = c.fetchall()
+            if origin_coords and radius_km > 0:
+                lat0, lon0 = origin_coords["lat"], origin_coords["lng"]
+                items = [
+                    row for row in items
+                    if row["latitude"] and row["longitude"] and
+                    haversine(lat0, lon0, row["latitude"], row["longitude"]) <= radius_km
+                ]
         elif tab == "requests":
             if search_query:
                 c.execute("""
@@ -56,6 +76,13 @@ async def home(request: Request):
                     WHERE r.user_id != ?
                 """, (user_id,))
             requested_items = c.fetchall()
+            if origin_coords and radius_km > 0:
+                lat0, lon0 = origin_coords["lat"], origin_coords["lng"]
+                requested_items = [
+                    row for row in requested_items
+                    if row["latitude"] and row["longitude"] and
+                    haversine(lat0, lon0, row["latitude"], row["longitude"]) <= radius_km
+                ]
 
         my_requests = []
         my_items = []
@@ -91,4 +118,6 @@ async def home(request: Request):
         "my_items": my_items,
         "tab": tab,
         "cities": CITIES,
+        "origin_city": origin_city,
+        "radius": radius_km,
     })

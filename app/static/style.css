@@ -516,11 +516,19 @@ form {
     border: 1px solid var(--isabelline);
     border-radius: 6px;
     font-family: 'Roboto', sans-serif;
+    color: #888;
+    /* grey until user types */
 }
+
 
 .filter-container input[type="text"]:focus {
     border-color: var(--dar_purple);
     outline: none;
+}
+
+/* Turn search text black once user enters something */
+.filter-container input[type="text"]:not(:placeholder-shown) {
+    color: var(--dar_purple);
 }
 
 .filter-container button {
@@ -553,7 +561,8 @@ form {
     color: #666;
 
     /* border & radius */
-    border: 2px solid var(--isabelline);
+    border: 8px solid var(--isabelline);
+    /* match form-container */
     border-radius: 6px;
 }
 
@@ -590,4 +599,15 @@ form {
 /* disabled option (first “-- Choose a city --”) */
 .city-select option[value=""] {
     color: #888;
+}
+
+/* Filter ‑‑ location radius + city dropdown tweaks  */
+.filter-container select,
+.filter-container input[type="number"] {
+    background-color: white;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--isabelline);
+    border-radius: 6px;
+    font-family: 'Roboto', sans-serif;
 }

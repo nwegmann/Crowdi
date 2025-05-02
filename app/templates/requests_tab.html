@@ -4,6 +4,14 @@
         <input type="hidden" name="tab" value="requests">
         <input type="text" name="search" placeholder="Search items..."
             value="{{ request.query_params.get('search', '') }}">
+        <select name="origin_city">
+            <option value="">Any location</option>
+            {% for city in cities %}
+            <option value="{{ city }}" {% if origin_city==city %}selected{% endif %}>{{ city }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="number" name="radius" min="1" max="100" value="{{ radius if radius else '' }}" placeholder="km">
         <button type="submit">Filter</button>
         <button class="reset-filter">Reset</button>
     </form>
