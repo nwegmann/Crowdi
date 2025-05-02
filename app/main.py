@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.routes import routers  # Import the routes from the new modularized files
 import app.db as db
+from app.data.cities import CITIES
 import os
 
 app = FastAPI()

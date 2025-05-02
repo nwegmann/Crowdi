@@ -7,6 +7,9 @@
         <p><strong>Name:</strong> {{ item.name }}</p>
         <p><strong>Description:</strong> {{ item.description }}</p>
         <p><strong>Owner:</strong> {{ item.owner }}</p>
+        {% if item.city %}
+        <p><strong>Location:</strong> {{ item.city }}</p>
+        {% endif %}
         {% if item.hashtags %}
         <div class="hashtags">
             {% for tag in item.hashtags.split(",") %}

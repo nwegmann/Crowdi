@@ -26,6 +26,9 @@ def init_db():
                 description TEXT,
                 hashtags TEXT,
                 status TEXT DEFAULT 'available',
+                city TEXT,
+                latitude REAL,
+                longitude REAL,
                 FOREIGN KEY(owner_id) REFERENCES users(id)
             )
         ''')
@@ -79,6 +82,9 @@ def init_db():
                 title TEXT NOT NULL,
                 description TEXT,
                 hashtags TEXT,
+                city TEXT,
+                latitude REAL,
+                longitude REAL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )

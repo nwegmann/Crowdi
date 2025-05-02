@@ -538,3 +538,56 @@ form {
 .filter-container button:hover {
     background-color: var(--dar_purple);
 }
+
+/* ---- City dropdown styling ---- */
+.city-select {
+    appearance: none;
+    /* remove system arrow so we can style */
+    /* size & font */
+    padding: 10px 14px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+
+    /* colors */
+    background-color: white;
+    color: #666;
+
+    /* border & radius */
+    border: 2px solid var(--isabelline);
+    border-radius: 6px;
+}
+
+.city-select {
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: 'Roboto', sans-serif;
+}
+
+.city-select textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* hover / focus */
+.city-select:hover,
+.city-select:focus {
+    border-color: var(--flame);
+    outline: none;
+}
+
+/* When a real city is selected (select is valid), make text black */
+.city-select:required:valid {
+    color: var(--dar_purple);
+    /* or simply #000 if you prefer pure black */
+}
+
+/* disabled option (first “-- Choose a city --”) */
+.city-select option[value=""] {
+    color: #888;
+}

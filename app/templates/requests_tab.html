@@ -22,6 +22,9 @@
         </div>
         {% endif %}
         <p><strong>Requester:</strong> {{ req.username }}</p>
+        {% if req.city %}
+        <p><strong>Location:</strong> {{ req.city }}</p>
+        {% endif %}
         {% if user_id and req.user_id|int != user_id|int %}
         <form method="post" action="/start_conversation">
             <input type="hidden" name="item_id" value="{{ req.id }}">

@@ -12,6 +12,9 @@ async def add_item(
     name: str = Form(...),
     description: str = Form(...),
     hashtags: str = Form(""),
+    city: Optional[str] = Form(None),
+    latitude: Optional[float] = Form(None),
+    longitude: Optional[float] = Form(None),
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
@@ -21,9 +24,9 @@ async def add_item(
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            INSERT INTO items (name, description, status, hashtags, owner_id)
-            VALUES (?, ?, ?, ?, ?)
-        """, (name, description, "available", hashtags, user_id))
+            INSERT INTO items (name, description, status, hashtags, owner_id, city, latitude, longitude)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (name, description, "available", hashtags, user_id, city, latitude, longitude))
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)
@@ -56,4 +59,3 @@ async def delete_item(request: Request, item_id: int = Form(...)):
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)
-

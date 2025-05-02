@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Form, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, HTMLResponse
@@ -13,6 +14,9 @@ async def add_request(
     title: str = Form(...),
     description: str = Form(...),
     hashtags: str = Form(None),
+    city: str = Form(None),
+    latitude: Optional[float] = Form(None),
+    longitude: Optional[float] = Form(None),
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
@@ -22,9 +26,9 @@ async def add_request(
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            INSERT INTO requested_items (title, description, hashtags, user_id)
-            VALUES (?, ?, ?, ?)
-        """, (title, description, hashtags, user_id))
+            INSERT INTO requested_items (title, description, hashtags, user_id, city, latitude, longitude)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (title, description, hashtags, user_id, city, latitude, longitude))
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)

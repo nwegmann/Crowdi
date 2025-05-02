@@ -41,7 +41,7 @@ async def home(request: Request):
         with sqlite3.connect(DB_PATH) as conn:
             c = conn.cursor()
             c.execute("""
-                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, u.id
+                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, u.id, i.city, i.latitude, i.longitude
                 FROM items i 
                 JOIN users u ON i.owner_id = u.id 
                 WHERE i.owner_id != ?
@@ -49,7 +49,7 @@ async def home(request: Request):
             items = c.fetchall()
 
             c.execute("""
-                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username
+                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.city, i.latitude, i.longitude
                 FROM items i 
                 JOIN users u ON i.owner_id = u.id 
                 WHERE i.owner_id = ?

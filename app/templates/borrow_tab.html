@@ -15,6 +15,9 @@
         <h3>{{ item.name }}</h3>
         <p>{{ item.description }}</p>
         <p><strong>Owner:</strong> {{ item.username }}</p>
+        {% if item.city %}
+        <p><strong>Location:</strong> {{ item.city }}</p>
+        {% endif %}
         {% if item.hashtags %}
         <div class="hashtags">
             {% for tag in item.hashtags.split(",") %}

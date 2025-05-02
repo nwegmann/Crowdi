@@ -50,6 +50,13 @@
     </header>
     {% block content %}{% endblock %}
 
+    {% if cities %}
+    <script id="cities-json" type="application/json">
+    {{ cities | tojson | safe }}
+</script>
+    {% endif %}
+
+    <script src="/static/js/location.js"></script>
 </body>
 
 </html>
