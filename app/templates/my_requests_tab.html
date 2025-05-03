@@ -1,9 +1,10 @@
 <div class="form-container">
     <h2>Request an Item</h2>
-    <form action="/add_request" method="post">
+    <form action="/add_request" method="post" enctype="multipart/form-data">
         <input type="text" name="title" placeholder="What do you need?" required>
         <textarea name="description" placeholder="Describe your request..." required></textarea>
         <input type="text" name="hashtags" placeholder="Hashtags (comma-separated)">
+        <input type="file" name="image" accept="image/*">
         <select name="city" id="city-request" class="city-select" required>
             <option value="">Choose a city</option>
             {% for city in cities %}
@@ -21,6 +22,10 @@
     {% if my_requests %}
     {% for req in my_requests %}
     <div class="item-card">
+        {% if req.image_path %}
+        <img src="{{ request.url_for('static', path=req.image_path.startswith('uploads/') and req.image_path or 'uploads/' ~ req.image_path) }}"
+            alt="{{ req.name }} image" class="img-thumb">
+        {% endif %}
         <h3>{{ req.title }}</h3>
         <p>{{ req.description }}</p>
         {% if req.city %}

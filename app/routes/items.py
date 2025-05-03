@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, File, UploadFile, Request
+from app.utils.files import save_optional_image
 from fastapi.responses import RedirectResponse
 import sqlite3
 from typing import Optional
@@ -15,18 +16,26 @@ async def add_item(
     city: Optional[str] = Form(None),
     latitude: Optional[float] = Form(None),
     longitude: Optional[float] = Form(None),
+    image: UploadFile | None = File(None),
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
         return RedirectResponse(url="/", status_code=303)
 
+    image_path = save_optional_image(image)
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            INSERT INTO items (name, description, status, hashtags, owner_id, city, latitude, longitude)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (name, description, "available", hashtags, user_id, city, latitude, longitude))
+            INSERT INTO items (
+                name, description, status, hashtags, owner_id,
+                city, latitude, longitude, image_path
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            name, description, "available", hashtags, user_id,
+            city, latitude, longitude, image_path
+        ))
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)

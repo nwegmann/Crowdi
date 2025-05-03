@@ -611,3 +611,18 @@ form {
     border-radius: 6px;
     font-family: 'Roboto', sans-serif;
 }
+
+/* Thumbnail images inside item/request cards */
+.img-thumb {
+    max-width: 100%;
+    /* scale down but never stretch */
+    /* fill card width but scale down with card */
+    height: auto;
+    /* keep original aspect ratio */
+    max-height: 220px;
+    /* prevent extremely tall images */
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto 10px;
+    /* space below image */
+}

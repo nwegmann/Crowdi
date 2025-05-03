@@ -1,9 +1,10 @@
 <div class="form-container">
     <h2>Add New Item</h2>
-    <form action="/add_item" method="post">
+    <form action="/add_item" method="post" enctype="multipart/form-data">
         <input type="text" name="name" placeholder="Item name" required>
         <textarea name="description" placeholder="Describe the item..." required></textarea>
         <input type="text" name="hashtags" placeholder="Hashtags (comma separated)">
+        <input type="file" name="image" accept="image/*">
         <select name="city" id="city-item" class="city-select" required>
             <option value="">Choose a city</option>
             {% for city in cities %}
@@ -23,6 +24,10 @@
     <div class="item-card">
         <h3>{{ item.name }}</h3>
         <p>{{ item.description }}</p>
+        {% if item.image_path %}
+        <img src="{{ request.url_for('static', path=item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path) }}"
+            alt="{{ item.name }} image" class="img-thumb">
+        {% endif %}
         {% if item.city %}
         <p><strong>Location:</strong> {{ item.city }}</p>
         {% endif %}

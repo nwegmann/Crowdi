@@ -1,5 +1,6 @@
 from typing import Optional
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, File, UploadFile, Request
+from app.utils.files import save_optional_image
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, HTMLResponse
 import sqlite3
@@ -17,18 +18,27 @@ async def add_request(
     city: str = Form(None),
     latitude: Optional[float] = Form(None),
     longitude: Optional[float] = Form(None),
+    image: UploadFile | None = File(None),
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
         return RedirectResponse(url="/", status_code=303)
 
+    image_path = save_optional_image(image)
+
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            INSERT INTO requested_items (title, description, hashtags, user_id, city, latitude, longitude)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (title, description, hashtags, user_id, city, latitude, longitude))
+            INSERT INTO requested_items (
+                title, description, hashtags, user_id, city,
+                latitude, longitude, image_path
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            title, description, hashtags, user_id, city,
+            latitude, longitude, image_path
+        ))
         conn.commit()
 
     return RedirectResponse(url="/", status_code=303)
@@ -65,7 +75,7 @@ async def my_requests(request: Request):
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username
+            SELECT r.id, r.title, r.description, r.hashtags, r.image_path, r.user_id, u.username
             FROM requested_items r
             JOIN users u ON r.user_id = u.id
             WHERE r.user_id = ?
@@ -87,7 +97,7 @@ async def requests(request: Request):
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("""
-            SELECT r.id, r.title,r. description, r.hashtags, r.user_id, u.username
+            SELECT r.id, r.title, r.description, r.hashtags, r.image_path, r.user_id, u.username
             FROM requested_items r
             JOIN users u ON r.user_id = u.id
             WHERE r.user_id != ?

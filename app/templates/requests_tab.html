@@ -22,6 +22,9 @@
     <div class="item-card">
         <h3>{{ req.title }}</h3>
         <p>{{ req.description }}</p>
+        {% if req.image_path %}
+        <img src="{{ request.url_for('static', path=req.image_path) }}" alt="{{ req.title }} image" class="img-thumb">
+        {% endif %}
         {% if req.hashtags %}
         <div class="hashtags">
             {% for tag in req.hashtags.split(",") %}
