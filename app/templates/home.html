@@ -26,17 +26,19 @@
 
 {% else %}
 <div class="form-container">
-        <h2>Login</h2>
-        {% if request.query_params.get('error') %}
-            <p style="color: red;">{{ request.query_params.get('error') }}</p>
-        {% endif %}
-        <form action="/login" method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <p><strong>Note:</strong> This will be your permanent password. You won't be able to change it later.</p>
-            <button type="submit">Login</button>
-        </form>
-    </div>
+    <h2>Login</h2>
+    {% if request.query_params.get('error') %}
+    <p style="color: red;">{{ request.query_params.get('error') }}</p>
+    {% endif %}
+    <form action="/login" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <span style="font-size:0.8em;">
+            Note: This will be your permanent password. You won't be able to change it later.
+        </span>
+        <button type="submit">Login</button>
+    </form>
+</div>
 {% endif %}
 
 <script src="/static/js/tabs.js"></script>

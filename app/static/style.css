@@ -112,7 +112,6 @@ form {
     padding: 20px;
     display: inline-block;
     text-align: left;
-    font-weight: bold;
 }
 
 .item-card {
@@ -248,6 +247,7 @@ form {
     max-width: 600px;
     margin: 20px auto;
     font-family: 'Roboto', sans-serif;
+    color: var(--dar_purple);
 }
 
 .form-container input,
@@ -628,7 +628,8 @@ form {
 }
 
 .notification-banner {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
+    /* Green */
     color: white;
     padding: 10px;
     text-align: center;
