@@ -626,3 +626,29 @@ form {
     margin: 0 auto 10px;
     /* space below image */
 }
+
+.notification-banner {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 16px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+.notification-banner button {
+    background-color: transparent;
+    color: white;
+    border: none;
+    font-size: 16px;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+.notification-banner button:hover {
+    background-color: #555;
+}

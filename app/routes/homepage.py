@@ -38,7 +38,7 @@ async def home(request: Request):
         if tab == "borrow":
             if search_query:
                 c.execute("""
-                    SELECT i.id, i.name, i.description, i.status, i.hashtags, i.image_path, u.username, i.owner_id, i.city, i.latitude, i.longitude
+                    SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.owner_id, i.city, i.latitude, i.longitude
                     FROM items i
                     JOIN users u ON i.owner_id = u.id
                     WHERE (i.owner_id != ?)
@@ -46,7 +46,7 @@ async def home(request: Request):
                 """, (user_id_int if user_id_int else -1, f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"))
             else:
                 c.execute("""
-                    SELECT i.id, i.name, i.description, i.status, i.hashtags, i.image_path, u.username, i.owner_id, i.city, i.latitude, i.longitude
+                    SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.owner_id, i.city, i.latitude, i.longitude
                     FROM items i
                     JOIN users u ON i.owner_id = u.id
                     WHERE i.owner_id != ?
@@ -62,7 +62,7 @@ async def home(request: Request):
         elif tab == "requests":
             if search_query:
                 c.execute("""
-                    SELECT r.id, r.title, r.description, r.hashtags, r.image_path, r.user_id, u.username, r.city, r.latitude, r.longitude
+                    SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username, r.city, r.latitude, r.longitude
                     FROM requested_items r
                     JOIN users u ON r.user_id = u.id
                     WHERE r.user_id != ? 
@@ -70,7 +70,7 @@ async def home(request: Request):
                 """, (user_id, f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"))
             else:
                 c.execute("""
-                    SELECT r.id, r.title, r.description, r.hashtags, r.image_path, r.user_id, u.username, r.city, r.latitude, r.longitude
+                    SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username, r.city, r.latitude, r.longitude
                     FROM requested_items r
                     JOIN users u ON r.user_id = u.id
                     WHERE r.user_id != ?
@@ -88,7 +88,7 @@ async def home(request: Request):
         my_items = []
         if user_id_int:
             c.execute("""
-                SELECT r.id, r.title, r.description, r.hashtags, r.image_path, r.user_id, u.username, r.city, r.latitude, r.longitude
+                SELECT r.id, r.title, r.description, r.hashtags, r.user_id, u.username, r.city, r.latitude, r.longitude
                 FROM requested_items r
                 JOIN users u ON r.user_id = u.id
                 WHERE r.user_id = ?
@@ -96,7 +96,7 @@ async def home(request: Request):
             my_requests = c.fetchall()
 
             c.execute("""
-                SELECT i.id, i.name, i.description, i.status, i.hashtags, i.image_path, u.username, i.city, i.latitude, i.longitude
+                SELECT i.id, i.name, i.description, i.status, i.hashtags, u.username, i.city, i.latitude, i.longitude
                 FROM items i
                 JOIN users u ON i.owner_id = u.id
                 WHERE i.owner_id = ?
