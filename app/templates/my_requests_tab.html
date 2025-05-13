@@ -1,51 +1,97 @@
-<div class="form-container">
-    <h2>Request an Item</h2>
-    <form action="/add_request" method="post" enctype="multipart/form-data">
-        <input type="text" name="title" placeholder="What do you need?" required>
-        <textarea name="description" placeholder="Describe your request..." required></textarea>
-        <input type="text" name="hashtags" placeholder="Hashtags (comma-separated)">
-        <input type="file" name="image" accept="image/*">
-        <select name="city" id="city-request" class="city-select" required>
-            <option value="">Choose a city</option>
-            {% for city in cities %}
-            <option value="{{ city }}">{{ city }}</option>
+<div class="lend-container">
+    <div class="lend-items">
+        <h2>My Requests</h2>
+        <div class="item-grid">
+            {% if my_requests %}
+            {% for req in my_requests %}
+            <div class="item-card">
+                {% if req.image_path %}
+                <img src="{{ request.url_for('static', path=req.image_path.startswith('uploads/') and req.image_path or 'uploads/' ~ req.image_path) }}"
+                    alt="{{ req.name }} image" class="img-thumb">
+                {% endif %}
+                <h3>{{ req.title }}</h3>
+                <p>{{ req.description }}</p>
+                {% if req.city %}
+                <p><strong>Location:</strong> {{ req.city }}</p>
+                {% endif %}
+                {% if req.hashtags %}
+                <div class="hashtags">
+                    {% for tag in req.hashtags.split(",") %}
+                    <span class="hashtag-bubble">{{ tag.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <form action="/delete_request" method="post" style="display:inline;">
+                    <input type="hidden" name="request_id" value="{{ req.id }}">
+                    <button type="submit"
+                        onclick="return confirm('Are you sure you want to delete this request?')">Delete</button>
+                </form>
+            </div>
             {% endfor %}
-        </select>
-
-        <input type="hidden" name="latitude" id="latitude-request">
-        <input type="hidden" name="longitude" id="longitude-request">
-        <button type="submit">Post Request</button>
-    </form>
-</div>
-<h2>My Requests</h2>
-<div class="item-grid">
-    {% if my_requests %}
-    {% for req in my_requests %}
-    <div class="item-card">
-        {% if req.image_path %}
-        <img src="{{ request.url_for('static', path=req.image_path.startswith('uploads/') and req.image_path or 'uploads/' ~ req.image_path) }}"
-            alt="{{ req.name }} image" class="img-thumb">
-        {% endif %}
-        <h3>{{ req.title }}</h3>
-        <p>{{ req.description }}</p>
-        {% if req.city %}
-        <p><strong>Location:</strong> {{ req.city }}</p>
-        {% endif %}
-        {% if req.hashtags %}
-        <div class="hashtags">
-            {% for tag in req.hashtags.split(",") %}
-            <span class="hashtag-bubble">{{ tag.strip() }}</span>
-            {% endfor %}
+            {% else %}
+            <p>You have not posted any requests yet.</p>
+            {% endif %}
         </div>
-        {% endif %}
-        <form action="/delete_request" method="post" style="display:inline;">
-            <input type="hidden" name="request_id" value="{{ req.id }}">
-            <button type="submit"
-                onclick="return confirm('Are you sure you want to delete this request?')">Delete</button>
-        </form>
     </div>
-    {% endfor %}
-    {% else %}
-    <p>You have not posted any requests yet.</p>
-    {% endif %}
+
+    <div class="lend-form">
+        <div class="form-container">
+            <h2>Request an Item</h2>
+            <form action="/add_request" method="post" enctype="multipart/form-data"
+                onsubmit="return requireLatLng(this)">
+                <input type="text" name="title" placeholder="What do you need?" required>
+                <textarea name="description" placeholder="Describe your request..." required></textarea>
+                <input type="text" name="hashtags" placeholder="Hashtags (comma-separated)">
+                <div class="file-upload">
+                    <input type="file" name="image" id="image-upload-request" accept="image/*"
+                        onchange="showFileNameAndPreview(this, 'file-name-request', 'request-preview')">
+                    <label for="image-upload-request" class="file-input-label">Select Photo</label>
+                    <div class="file-name" id="file-name-request"></div>
+                    <img id="request-preview" class="img-thumb"
+                        style="display:none; margin-top:8px; max-width:120px; max-height:120px;" />
+                </div>
+                <select name="city" id="city-request" class="city-select" required>
+                    <option value="">Choose a city</option>
+                    {% for city in cities %}
+                    <option value="{{ city }}">{{ city }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="hidden" name="latitude" id="latitude-request">
+                <input type="hidden" name="longitude" id="longitude-request">
+                <button type="submit">Post Request</button>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script src="/static/js/location.js"></script>
+<script>
+    function showFileNameAndPreview(input, nameId, imgId) {
+        const fileNameDiv = document.getElementById(nameId);
+        const img = document.getElementById(imgId);
+        if (input.files && input.files[0]) {
+            fileNameDiv.textContent = input.files[0].name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            fileNameDiv.textContent = '';
+            img.src = '';
+            img.style.display = 'none';
+        }
+    }
+
+    function requireLatLng(form) {
+        var lat = form.querySelector('[name="latitude"]').value;
+        var lng = form.querySelector('[name="longitude"]').value;
+        if (!lat || !lng) {
+            alert('Please select a location.');
+            return false;
+        }
+        return true;
+    }
+</script>

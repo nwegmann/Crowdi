@@ -84,7 +84,7 @@ async def view_conversation(request: Request, conversation_id: int):
         other_username = c.fetchone()["username"]
 
         c.execute("""
-            SELECT i.name, i.description, u.username, i.hashtags, i.city
+            SELECT i.name, i.description, u.username, i.hashtags, i.city, i.image_path, i.owner_id
             FROM items i
             JOIN users u ON i.owner_id = u.id
             WHERE i.id = ?
@@ -97,6 +97,8 @@ async def view_conversation(request: Request, conversation_id: int):
             "owner": item_row["username"],
             "hashtags": item_row["hashtags"],
             "city": item_row["city"],
+            "image_path": item_row["image_path"],
+            "owner_id": item_row["owner_id"]
         } if item_row else None
 
         c.execute("SELECT username FROM users WHERE id = ?", (user_id,))
@@ -110,6 +112,7 @@ async def view_conversation(request: Request, conversation_id: int):
         "messages": messages,
         "item": item,
         "other_username": other_username,
+        "other_user_id": other_id,
         "username": username
     })
 

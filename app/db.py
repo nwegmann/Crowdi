@@ -15,7 +15,9 @@ def init_db():
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                trust_score FLOAT DEFAULT 5.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         # Items available for lending
@@ -31,6 +33,8 @@ def init_db():
                 city TEXT,
                 latitude REAL,
                 longitude REAL,
+                condition_score FLOAT DEFAULT 5.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(owner_id) REFERENCES users(id)
             )
         ''')
@@ -47,7 +51,7 @@ def init_db():
                 FOREIGN KEY(borrower_id) REFERENCES users(id)
             )
         ''')
-                # Conversations
+        # Conversations
         c.execute('''
             CREATE TABLE IF NOT EXISTS conversations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +64,6 @@ def init_db():
                 FOREIGN KEY (item_id) REFERENCES items(id)
             )
         ''')
-
         # Messages
         c.execute('''
             CREATE TABLE IF NOT EXISTS messages (
@@ -90,6 +93,20 @@ def init_db():
                 longitude REAL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(user_id) REFERENCES users(id)
+            )
+        ''')
+        # User ratings
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS user_ratings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                rater_id INTEGER,
+                rated_id INTEGER,
+                rating FLOAT NOT NULL,
+                comment TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (rater_id) REFERENCES users(id),
+                FOREIGN KEY (rated_id) REFERENCES users(id),
+                UNIQUE(rater_id, rated_id)
             )
         ''')
         conn.commit()
