@@ -37,4 +37,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // update immediately if a city is pre‑selected
         if (select.value) setCoords();
     });
+
+    // File input handling
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function (e) {
+            const fileName = e.target.files[0]?.name || 'No file selected';
+            const fileNameDiv = document.getElementById(input.id + '-request' === 'image-upload-request' ? 'file-name-request' : 'file-name');
+            if (fileNameDiv) {
+                fileNameDiv.textContent = fileName;
+            }
+        });
+    });
 });

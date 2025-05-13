@@ -16,13 +16,16 @@ async def add_request(
     description: str = Form(...),
     hashtags: str = Form(None),
     city: str = Form(None),
-    latitude: Optional[float] = Form(None),
-    longitude: Optional[float] = Form(None),
+    latitude: float = Form(...),
+    longitude: float = Form(...),
     image: UploadFile | None = File(None),
 ):
     user_id = request.cookies.get("user_id")
     if not user_id:
         return RedirectResponse(url="/", status_code=303)
+
+    if latitude is None or longitude is None:
+        return RedirectResponse(url="/?error=Location+is+required", status_code=303)
 
     image_path = save_optional_image(image)
 

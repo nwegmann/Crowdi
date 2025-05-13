@@ -7,10 +7,10 @@
         <p><strong>Name:</strong> {{ item.name }}</p>
         <p><strong>Description:</strong> {{ item.description }}</p>
         {% if item.image_path %}
-        <img src="{{ request.url_for('static', path=item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path) }}"
-            alt="{{ item.name }} image" class="img-thumb">
+        <img src="/static/{{ item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path }}"
+            alt="{{ item.name }} image" class="img-thumb" onclick="openImageModal(this.src)">
         {% endif %}
-        <p><strong>Owner:</strong> {{ item.owner }}</p>
+        <p><strong>Owner:</strong> <a href="/user/{{ item.owner_id }}" class="chat-username">{{ item.owner }}</a></p>
         {% if item.city %}
         <p><strong>Location:</strong> {{ item.city }}</p>
         {% endif %}
@@ -25,29 +25,119 @@
 
     <!-- Main chat area -->
     <div class="chat-container" style="display: flex; flex-direction: column; flex: 1;">
-        <h2 style="flex: 0 0 auto;">Chat with {{ other_username }}</h2>
+        <h2 style="flex: 0 0 auto;">Chat with <a href="/user/{{ other_user_id }}" class="chat-username">{{
+                other_username }}</a></h2>
 
         <div id="message-list" style="flex: 1 1 auto; overflow-y: auto; margin-bottom: 20px;">
             {% for msg in messages %}
             <div class="message {% if msg.sender_id == user_id %}sent{% else %}received{% endif %}">
-                <strong>{{ msg.username }}:</strong> {{ msg.content }}<br>
+                <strong>{{ msg.username }}:</strong>
+                {% if msg.content.startswith('data:image') %}
+                <img src="{{ msg.content }}" alt="Shared image" class="message-image"
+                    onclick="openImageModal(this.src)">
+                {% else %}
+                {{ msg.content }}
+                {% endif %}
+                <br>
                 <small>{{ msg.sent_at }}</small>
             </div>
             {% endfor %}
         </div>
 
         <form method="post" action="/conversations/{{ conversation_id }}/send" class="message-form"
-            style="flex: 0 0 auto; display: flex; flex-direction: row; gap: 10px;">
-            <textarea name="content" placeholder="Type your message..." required style="flex: 1;"></textarea>
+            style="flex: 0 0 auto; display: flex; flex-direction: row; gap: 10px; align-items: flex-end;"
+            enctype="multipart/form-data">
+            <div class="message-input-container" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <textarea name="content" placeholder="Type your message..." style="flex: 1;"></textarea>
+                <div id="image-preview" class="image-preview">
+                    <button type="button" class="remove-image" onclick="removeImage()" style="display: none;">Remove
+                        Image</button>
+                </div>
+                <div class="file-upload" style="margin-top: 8px; align-self: flex-start;">
+                    <input type="file" name="image" id="image-upload" accept="image/*" style="display: none;">
+                    <label for="image-upload" class="file-input-label">Add Image</label>
+                </div>
+            </div>
             <button type="submit">Send</button>
         </form>
     </div>
 </div>
 
+<!-- Image Modal -->
+<div id="imageModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+
 <script>
-    window.addEventListener('load', function () {
-        const messageList = document.getElementById('message-list');
-        messageList.scrollTop = messageList.scrollHeight;
+    function openImageModal(imgSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.style.display = "flex";
+        modalImg.src = imgSrc;
+    }
+
+    // Close modal when clicking the X or outside the image
+    document.querySelector('.close-modal').onclick = function () {
+        document.getElementById('imageModal').style.display = "none";
+    }
+
+    document.getElementById('imageModal').onclick = function (e) {
+        if (e.target === this) {
+            this.style.display = "none";
+        }
+    }
+
+    function removeImage() {
+        const preview = document.getElementById('image-preview');
+        const textarea = document.querySelector('textarea[name="content"]');
+        const removeButton = document.querySelector('.remove-image');
+        const fileInput = document.getElementById('image-upload');
+
+        preview.innerHTML = '';
+        preview.classList.remove('show');
+        removeButton.style.display = 'none';
+        textarea.style.display = 'block';
+        fileInput.value = '';
+
+        // Remove the hidden input if it exists
+        const hiddenInput = document.querySelector('input[name="image_data"]');
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
+    }
+
+    // Handle image upload preview
+    document.getElementById('image-upload').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('image-preview');
+                const textarea = document.querySelector('textarea[name="content"]');
+                const removeButton = document.querySelector('.remove-image');
+
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview" class="preview-image">
+                    <button type="button" class="remove-image" onclick="removeImage()">Remove Image</button>
+                `;
+                preview.classList.add('show');
+                textarea.style.display = 'none';
+                removeButton.style.display = 'block';
+
+                // Store the image data in a hidden input
+                const form = document.querySelector('.message-form');
+                let hiddenInput = form.querySelector('input[name="image_data"]');
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'image_data';
+                    form.appendChild(hiddenInput);
+                }
+                hiddenInput.value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     });
 </script>
 {% endblock %}

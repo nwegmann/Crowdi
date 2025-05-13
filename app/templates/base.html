@@ -13,8 +13,10 @@
 
 <body>
     <header class="site-header">
-        <div class="title-section">
-            <a href="/" class="site-title">Crowdi</a>
+        <div class="header-section title-section">
+            <a href="/" style="text-decoration: none;">
+                <h1 class="site-title">Crowdi</h1>
+            </a>
         </div>
 
         {% if user_id %}
@@ -30,31 +32,41 @@
                 </a>
             </div>
         </div>
-        {% endif %}
 
         <div class="login-section">
-            {% if not user_id %}
-            <form action="/login" method="post" class="login-inline">
-                <input type="text" name="username" placeholder="Your name" required>
-                <button type="submit">Log in</button>
-            </form>
-            {% else %}
             <div class="logout-section">
-                <span class="login-status">{{ username }}</span>
+                <a href="/user/{{ user_id }}" class="login-status">{{ username }}</a>
                 <form action="/logout" method="post">
                     <button type="submit" class="logout-button">Sign out</button>
                 </form>
             </div>
-            {% endif %}
         </div>
+        {% endif %}
     </header>
     {% block content %}{% endblock %}
 
     {% if cities %}
     <script id="cities-json" type="application/json">
     {{ cities | tojson | safe }}
-</script>
+    </script>
     {% endif %}
+
+    <footer class="info-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <p>A community platform for sharing and borrowing items.</p>
+            </div>
+            <div class="footer-section">
+                <ul>
+                    <li>Post items to lend</li>
+                    <li>Request items you need</li>
+                    <li>Connect with others</li>
+                    <li>Build trust through ratings</li>
+                    <li>Share items in your area</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
 
     <script src="/static/js/location.js"></script>
 </body>

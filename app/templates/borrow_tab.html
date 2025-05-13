@@ -20,33 +20,76 @@
     {% if items %}
     {% for item in items %}
     <div class="item-card">
-        <h3>{{ item.name }}</h3>
-        <p>{{ item.description }}</p>
         {% if item.image_path %}
-        <img src="{{ request.url_for('static', path=item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path) }}"
-            alt="{{ item.name }} image" class="img-thumb">
+        <img src="/static/{{ item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path }}"
+            alt="{{ item.name }} image" class="img-thumb" onclick="openImageModal(this.src)">
         {% endif %}
-        <p><strong>Owner:</strong> {{ item.username }}</p>
-        {% if item.city %}
-        <p><strong>Location:</strong> {{ item.city }}</p>
-        {% endif %}
-        {% if item.hashtags %}
-        <div class="hashtags">
-            {% for tag in item.hashtags.split(",") %}
-            <span class="hashtag-bubble">{{ tag.strip() }}</span>
-            {% endfor %}
+        <div class="item-details">
+            <h3>{{ item.name }}</h3>
+            <p>{{ item.description }}</p>
+            <div class="item-meta">
+                <span class="item-owner">Owner: <a href="/user/{{ item.owner_id }}">{{ item.username }}</a></span>
+                {% if item.city %}
+                <span class="item-location">Location: {{ item.city }}</span>
+                {% endif %}
+                <span class="item-date">Posted: {{ item.created_at }}</span>
+                <div class="condition-score">
+                    {% set score = item.condition_score %}
+                    {% if score >= 9 %}
+                    <span class="score-excellent">Excellent Condition ({{ "%.1f"|format(score) }}/10)</span>
+                    {% elif score >= 7 %}
+                    <span class="score-good">Good Condition ({{ "%.1f"|format(score) }}/10)</span>
+                    {% elif score >= 5 %}
+                    <span class="score-fair">Fair Condition ({{ "%.1f"|format(score) }}/10)</span>
+                    {% elif score >= 3 %}
+                    <span class="score-poor">Poor Condition ({{ "%.1f"|format(score) }}/10)</span>
+                    {% else %}
+                    <span class="score-very-poor">Very Poor Condition ({{ "%.1f"|format(score) }}/10)</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="item-tags">
+                {% if item.hashtags %}
+                {% for tag in item.hashtags.split(',') %}
+                <span class="hashtag-bubble">{{ tag.strip() }}</span>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <form method="post" action="/start_conversation">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <input type="hidden" name="other_user_id" value="{{ item.owner_id }}">
+                <button type="submit" class="contact-button">Contact</button>
+            </form>
         </div>
-        {% endif %}
-        {% if user_id and item.owner_id|int != user_id|int %}
-        <form method="post" action="/start_conversation">
-            <input type="hidden" name="item_id" value="{{ item.id }}">
-            <input type="hidden" name="other_user_id" value="{{ item.owner_id }}">
-            <button type="submit">Contact</button>
-        </form>
-        {% endif %}
     </div>
     {% endfor %}
     {% else %}
     <p>No items available to borrow at the moment.</p>
     {% endif %}
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+
+<script>
+    function openImageModal(imgSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.style.display = "flex";
+        modalImg.src = imgSrc;
+    }
+
+    // Close modal when clicking the X or outside the image
+    document.querySelector('.close-modal').onclick = function () {
+        document.getElementById('imageModal').style.display = "none";
+    }
+
+    document.getElementById('imageModal').onclick = function (e) {
+        if (e.target === this) {
+            this.style.display = "none";
+        }
+    }
+</script>
