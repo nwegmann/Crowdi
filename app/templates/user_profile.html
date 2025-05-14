@@ -1,10 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="profile-container">
+{% set coop_style = (
+'background: #2ecc40; color: #fff;' if coop_label == 'Outstanding' else
+'background: #b5e61d; color: #222;' if coop_label == 'High' else
+'background: #ffe066; color: #222;' if coop_label == 'Average' else
+'background: #ff6f61; color: #fff;' if coop_label == 'Low' else
+'background: #ccc; color: #222;'
+) + ' padding: 6px 14px; border-radius: 8px; display: inline-block; margin-top: 6px; font-weight: bold;'
+%}
+{% set trust_style = (
+'background: #2ecc40; color: #fff;' if user.trust_score >= 8.5 else
+'background: #b5e61d; color: #222;' if user.trust_score >= 7 else
+'background: #ffe066; color: #222;' if user.trust_score >= 5 else
+'background: #ff6f61; color: #fff;' if user.trust_score < 5 else 'background: #ccc; color: #222;' )
+    + ' padding: 6px 14px; border-radius: 8px; display: inline-block; margin-top: 6px; font-weight: bold;' %} <div
+    class="profile-container">
     <div class="profile-header">
         <h1>{{ user.username }}'s Profile</h1>
-        <div class="trust-score">
+        <div class="trust-score" style="{{ trust_style }}">
             Trust Score: {{ "%.1f"|format(user.trust_score) }}/10
+        </div>
+        <div class="cooperation-score" style="{{ coop_style }}">
+            Cooperation: {{ coop_label }} (Score: {{ cooperation_score }})
         </div>
     </div>
 
@@ -54,6 +71,58 @@
     </div>
     {% endif %}
 
+    <div class="profile-section">
+        <h2>Currently Borrowing</h2>
+        {% if borrowing_items and borrowing_items|length > 0 %}
+        <div class="item-grid">
+            {% for item in borrowing_items %}
+            <div class="item-card">
+                {% if item.image_path %}
+                <img src="/static/{{ item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path }}"
+                    alt="{{ item.name }} image" class="img-thumb">
+                {% endif %}
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <p><strong>Owner:</strong> {{ item.owner_username }}</p>
+                {% if item.city %}<p><strong>Location:</strong> {{ item.city }}</p>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Not currently borrowing any items.</p>
+        {% endif %}
+    </div>
+
+    <div class="profile-section">
+        <h2>Currently Lending</h2>
+        {% if lending_items and lending_items|length > 0 %}
+        <div class="item-grid">
+            {% for item in lending_items %}
+            <div class="item-card">
+                {% if item.image_path %}
+                <img src="/static/{{ item.image_path.startswith('uploads/') and item.image_path or 'uploads/' ~ item.image_path }}"
+                    alt="{{ item.name }} image" class="img-thumb">
+                {% endif %}
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <p><strong>Borrower:</strong> {{ item.borrower_username }}</p>
+                {% if item.city %}<p><strong>Location:</strong> {{ item.city }}</p>{% endif %}
+                {% if user_id == user.id %}
+                <form method="post" action="/mark_returned" style="margin-top: 8px;">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit"
+                        style="background: #2ecc40; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Mark
+                        as Returned</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Not currently lending any items.</p>
+        {% endif %}
+    </div>
+
     <div class="profile-actions">
         {% if user_id == user.id %}
         <form method="post" action="/delete_account"
@@ -62,18 +131,18 @@
         </form>
         {% endif %}
     </div>
-</div>
+    </div>
 
-<script>
-    function updateLikertValue(val) {
-        document.getElementById('likert-value').textContent = parseFloat(val).toFixed(2);
-        let label = '';
-        if (val < 1.5) label = 'Very Dissatisfied';
-        else if (val < 2.5) label = 'Dissatisfied';
-        else if (val < 3.5) label = 'Neutral';
-        else if (val < 4.5) label = 'Satisfied';
-        else label = 'Very Satisfied';
-        document.getElementById('likert-text').textContent = label;
-    }
-</script>
-{% endblock %}
+    <script>
+        function updateLikertValue(val) {
+            document.getElementById('likert-value').textContent = parseFloat(val).toFixed(2);
+            let label = '';
+            if (val < 1.5) label = 'Very Dissatisfied';
+            else if (val < 2.5) label = 'Dissatisfied';
+            else if (val < 3.5) label = 'Neutral';
+            else if (val < 4.5) label = 'Satisfied';
+            else label = 'Very Satisfied';
+            document.getElementById('likert-text').textContent = label;
+        }
+    </script>
+    {% endblock %}

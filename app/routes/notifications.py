@@ -17,6 +17,7 @@ async def check_notifications(request: Request):
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
+        # Unread messages
         c.execute("""
             SELECT COUNT(*)
             FROM messages
@@ -26,9 +27,13 @@ async def check_notifications(request: Request):
             AND sender_id != ?
             AND seen = 0
         """, (user_id, user_id, user_id))
-        count = c.fetchone()[0]
-        print(count)
+        msg_count = c.fetchone()[0]
+        # Unseen notifications
+        c.execute("""
+            SELECT COUNT(*) FROM notifications WHERE user_id = ? AND seen = 0
+        """, (user_id,))
+        notif_count = c.fetchone()[0]
 
-    if count > 0:
+    if msg_count > 0 or notif_count > 0:
         return templates.TemplateResponse("notification_snippet.html", {"request": request})
     return HTMLResponse("")

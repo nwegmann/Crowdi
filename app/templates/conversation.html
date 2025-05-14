@@ -21,6 +21,65 @@
             {% endfor %}
         </div>
         {% endif %}
+
+        <!-- Borrow Request Management Section -->
+        {% if user_id == item.owner_id and item.status == 'available' %}
+        <div class="borrow-request-section section">
+            <h4 class="section-title">Borrow Requests</h4>
+            {% if pending_requests %}
+            <div class="request-list">
+                {% for request in pending_requests %}
+                <div class="borrow-request-card card">
+                    <div class="request-info">
+                        <span class="request-user"><strong>From:</strong> {{ request.username }}</span><br>
+                        <span class="request-date">Requested on: {{ request.created_at }}</span>
+                    </div>
+                    <div class="request-actions" style="display: flex; gap: 8px; margin-top: 8px;">
+                        <form method="post" action="/accept_borrow_request" style="flex: 1;">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="hidden" name="requester_id" value="{{ request.requester_id }}">
+                            <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
+                            <button type="submit" class="button button-accept">Accept</button>
+                        </form>
+                        <form method="post" action="/reject_borrow_request" style="flex: 1;">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="hidden" name="requester_id" value="{{ request.requester_id }}">
+                            <input type="hidden" name="conversation_id" value="{{ conversation_id }}">
+                            <button type="submit" class="button button-reject">Reject</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No pending requests</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Request Status Section for Requester -->
+        {% if request_status %}
+        <div class="request-status-section"
+            style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+            <h4 style="margin: 0 0 8px 0;">Your Request Status</h4>
+            <div class="request-status-card" style="padding: 8px; background: white; border-radius: 4px;">
+                {% if request_status.status == 'pending' %}
+                <p style="margin: 0 0 8px 0; color: #f39c12;">
+                    <strong>Status:</strong> Pending
+                </p>
+                {% elif request_status.status == 'accepted' %}
+                <p style="margin: 0 0 8px 0; color: #27ae60;">
+                    <strong>Status:</strong> Accepted
+                </p>
+                {% elif request_status.status == 'rejected' %}
+                <p style="margin: 0 0 8px 0; color: #c0392b;">
+                    <strong>Status:</strong> Rejected
+                </p>
+                {% endif %}
+                <p style="margin: 0; font-size: 0.9em; color: #666;">Requested on: {{ request_status.created_at }}</p>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Main chat area -->
@@ -140,4 +199,72 @@
         }
     });
 </script>
+
+<style>
+    .section {
+        margin-top: 16px;
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    .section-title {
+        margin: 0 0 8px 0;
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        padding: 10px 12px;
+        margin-bottom: 12px;
+    }
+
+    .request-info {
+        font-size: 0.97em;
+        color: #333;
+    }
+
+    .request-date {
+        font-size: 0.9em;
+        color: #888;
+    }
+
+    .button {
+        width: 100%;
+        padding: 6px 0;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.15s;
+    }
+
+    .button-accept {
+        background: #4CAF50;
+        color: #fff;
+    }
+
+    .button-accept:hover {
+        background: #388e3c;
+    }
+
+    .button-reject {
+        background: #f44336;
+        color: #fff;
+    }
+
+    .button-reject:hover {
+        background: #c62828;
+    }
+
+    .muted {
+        color: #888;
+        font-size: 0.97em;
+        margin: 0;
+    }
+</style>
 {% endblock %}

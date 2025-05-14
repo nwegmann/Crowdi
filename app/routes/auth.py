@@ -146,12 +146,65 @@ async def user_profile(request: Request, user_id: int):
         """, (user_id,))
         ratings = c.fetchall()
 
+        # Items the user is currently borrowing (active lendings)
+        c.execute("""
+            SELECT i.id, i.name, i.description, i.image_path, i.city, u.username as owner_username
+            FROM lendings l
+            JOIN items i ON l.item_id = i.id
+            JOIN users u ON i.owner_id = u.id
+            WHERE l.borrower_id = ? AND l.status = 'active'
+        """, (user_id,))
+        borrowing_items = c.fetchall()
+
+        # Items the user is lending (active lendings)
+        c.execute("""
+            SELECT i.id, i.name, i.description, i.image_path, i.city, u.username as borrower_username
+            FROM lendings l
+            JOIN items i ON l.item_id = i.id
+            JOIN users u ON l.borrower_id = u.id
+            WHERE l.lender_id = ? AND l.status = 'active'
+        """, (user_id,))
+        lending_items = c.fetchall()
+
+        # Cooperation score: number of lending transactions as lender
+        c.execute("""
+            SELECT COUNT(*) FROM lendings WHERE lender_id = ? AND status IN ('active', 'completed')
+        """, (user_id,))
+        cooperation_score = c.fetchone()[0]
+
+        # Get all users' cooperation scores
+        c.execute("""
+            SELECT users.id, COUNT(lendings.id) as score
+            FROM users
+            LEFT JOIN lendings ON users.id = lendings.lender_id AND lendings.status IN ('active', 'completed')
+            GROUP BY users.id
+        """)
+        all_scores = [row[1] for row in c.fetchall()]
+        all_scores_sorted = sorted(all_scores)
+        n = len(all_scores_sorted)
+        if n > 0:
+            user_rank = sum(s <= cooperation_score for s in all_scores_sorted) / n
+            if user_rank >= 0.9:
+                coop_label = "Outstanding"
+            elif user_rank >= 0.7:
+                coop_label = "High"
+            elif user_rank >= 0.3:
+                coop_label = "Average"
+            else:
+                coop_label = "Low"
+        else:
+            coop_label = "No Data"
+
     return templates.TemplateResponse("user_profile.html", {
         "request": request,
         "user": user,
         "ratings": ratings,
         "user_id": current_user_id,
-        "username": current_username
+        "username": current_username,
+        "borrowing_items": borrowing_items,
+        "lending_items": lending_items,
+        "cooperation_score": cooperation_score,
+        "coop_label": coop_label
     })
 
 @router.post("/delete_account")
@@ -190,3 +243,25 @@ async def delete_account(request: Request):
     response = RedirectResponse(url="/", status_code=303)
     response.delete_cookie("user_id")
     return response
+
+@router.post("/mark_returned")
+async def mark_returned(request: Request, item_id: int = Form(...)):
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return RedirectResponse(url="/", status_code=303)
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        # Check that the user is the lender for an active lending
+        c.execute("""
+            SELECT l.id FROM lendings l
+            JOIN items i ON l.item_id = i.id
+            WHERE l.item_id = ? AND l.lender_id = ? AND l.status = 'active'
+        """, (item_id, user_id))
+        lending = c.fetchone()
+        if not lending:
+            return RedirectResponse(url="/user/{}?error=Not+authorized".format(user_id), status_code=303)
+        # Mark lending as completed and item as available
+        c.execute("UPDATE lendings SET status = 'completed' WHERE item_id = ? AND lender_id = ? AND status = 'active'", (item_id, user_id))
+        c.execute("UPDATE items SET status = 'available' WHERE id = ?", (item_id,))
+        conn.commit()
+    return RedirectResponse(url=f"/user/{user_id}?success=returned", status_code=303)

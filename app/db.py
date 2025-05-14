@@ -43,11 +43,13 @@ def init_db():
             CREATE TABLE IF NOT EXISTS lendings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 item_id INTEGER NOT NULL,
+                lender_id INTEGER NOT NULL,
                 borrower_id INTEGER NOT NULL,
                 lend_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 return_date TIMESTAMP,
                 status TEXT DEFAULT 'active',
                 FOREIGN KEY(item_id) REFERENCES items(id),
+                FOREIGN KEY(lender_id) REFERENCES users(id),
                 FOREIGN KEY(borrower_id) REFERENCES users(id)
             )
         ''')
@@ -107,6 +109,29 @@ def init_db():
                 FOREIGN KEY (rater_id) REFERENCES users(id),
                 FOREIGN KEY (rated_id) REFERENCES users(id),
                 UNIQUE(rater_id, rated_id)
+            )
+        ''')
+        # Borrow requests
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS borrow_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item_id INTEGER NOT NULL,
+                requester_id INTEGER NOT NULL,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(item_id) REFERENCES items(id),
+                FOREIGN KEY(requester_id) REFERENCES users(id)
+            )
+        ''')
+        # Notifications
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                seen INTEGER DEFAULT 0,
+                FOREIGN KEY(user_id) REFERENCES users(id)
             )
         ''')
         conn.commit()

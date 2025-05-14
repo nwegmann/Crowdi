@@ -84,7 +84,7 @@ async def view_conversation(request: Request, conversation_id: int):
         other_username = c.fetchone()["username"]
 
         c.execute("""
-            SELECT i.name, i.description, u.username, i.hashtags, i.city, i.image_path, i.owner_id
+            SELECT i.id, i.name, i.description, u.username, i.hashtags, i.city, i.image_path, i.owner_id, i.status
             FROM items i
             JOIN users u ON i.owner_id = u.id
             WHERE i.id = ?
@@ -92,18 +92,57 @@ async def view_conversation(request: Request, conversation_id: int):
         item_row = c.fetchone()
 
         item = {
+            "id": item_row["id"],
             "name": item_row["name"],
             "description": item_row["description"],
             "owner": item_row["username"],
             "hashtags": item_row["hashtags"],
             "city": item_row["city"],
             "image_path": item_row["image_path"],
-            "owner_id": item_row["owner_id"]
+            "owner_id": item_row["owner_id"],
+            "status": item_row["status"]
         } if item_row else None
+
+        # Get pending borrow requests if user is the item owner
+        pending_requests = []
+        if item and int(user_id) == item["owner_id"] and item["status"] == "available":
+            c.execute("""
+                SELECT br.requester_id, u.username, br.created_at
+                FROM borrow_requests br
+                JOIN users u ON br.requester_id = u.id
+                WHERE br.item_id = ? AND br.status = 'pending'
+            """, (item_id,))
+            pending_requests = c.fetchall()
+
+        # Get request status if user is the requester
+        request_status = None
+        if item and int(user_id) != item["owner_id"]:
+            c.execute("""
+                SELECT status, created_at
+                FROM borrow_requests
+                WHERE item_id = ? AND requester_id = ?
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (item_id, user_id))
+            request_row = c.fetchone()
+            if request_row:
+                request_status = {
+                    "status": request_row["status"],
+                    "created_at": request_row["created_at"]
+                }
 
         c.execute("SELECT username FROM users WHERE id = ?", (user_id,))
         row = c.fetchone()
         username = row["username"] if row else None
+
+        # Mark notifications as seen for this item if the user is the owner
+        if item and int(user_id) == item["owner_id"]:
+            c.execute("""
+                UPDATE notifications
+                SET seen = 1
+                WHERE user_id = ? AND seen = 0 AND message LIKE ?
+            """, (user_id, f"%{item['name']}%"))
+            conn.commit()
 
     return templates.TemplateResponse("conversation.html", {
         "request": request,
@@ -113,7 +152,9 @@ async def view_conversation(request: Request, conversation_id: int):
         "item": item,
         "other_username": other_username,
         "other_user_id": other_id,
-        "username": username
+        "username": username,
+        "pending_requests": pending_requests,
+        "request_status": request_status
     })
 
 @router.post("/conversations/{conversation_id}/send")

@@ -55,6 +55,19 @@
                 {% endfor %}
                 {% endif %}
             </div>
+            {% if item.status == 'available' and user_id != item.owner_id %}
+            {% if item.request_status %}
+            <div class="request-status"
+                style="margin: 8px 0; padding: 8px; background: #f5f5f5; border-radius: 4px; text-align: center;">
+                <p style="margin: 0; color: #666;">Request Sent</p>
+            </div>
+            {% else %}
+            <form method="post" action="/request_borrow">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <button type="submit" class="borrow-button">Request to Borrow</button>
+            </form>
+            {% endif %}
+            {% endif %}
             <form method="post" action="/start_conversation">
                 <input type="hidden" name="item_id" value="{{ item.id }}">
                 <input type="hidden" name="other_user_id" value="{{ item.owner_id }}">

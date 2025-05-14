@@ -39,20 +39,32 @@ async def home(request: Request):
             if search_query:
                 c.execute("""
                     SELECT i.id, i.name, i.description, i.status, i.hashtags, i.image_path, u.username, i.owner_id, i.city, i.latitude, i.longitude, i.condition_score,
-                    strftime('%B %d, %Y', i.created_at) as created_at
+                    strftime('%B %d, %Y', i.created_at) as created_at,
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM borrow_requests br 
+                        WHERE br.item_id = i.id 
+                        AND br.requester_id = ? 
+                        AND br.status = 'pending'
+                    ) THEN 1 ELSE 0 END as request_status
                     FROM items i
                     JOIN users u ON i.owner_id = u.id
                     WHERE (i.owner_id != ?)
                     AND (i.name LIKE ? OR i.description LIKE ? OR i.hashtags LIKE ?)
-                """, (user_id_int if user_id_int else -1, f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"))
+                """, (user_id_int if user_id_int else -1, user_id_int if user_id_int else -1, f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"))
             else:
                 c.execute("""
                     SELECT i.id, i.name, i.description, i.status, i.hashtags, i.image_path, u.username, i.owner_id, i.city, i.latitude, i.longitude, i.condition_score,
-                    strftime('%B %d, %Y', i.created_at) as created_at
+                    strftime('%B %d, %Y', i.created_at) as created_at,
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM borrow_requests br 
+                        WHERE br.item_id = i.id 
+                        AND br.requester_id = ? 
+                        AND br.status = 'pending'
+                    ) THEN 1 ELSE 0 END as request_status
                     FROM items i
                     JOIN users u ON i.owner_id = u.id
                     WHERE i.owner_id != ?
-                """, (user_id_int if user_id_int else -1,))
+                """, (user_id_int if user_id_int else -1, user_id_int if user_id_int else -1))
             items = c.fetchall()
             if origin_coords and radius_km > 0:
                 lat0, lon0 = origin_coords["lat"], origin_coords["lng"]
